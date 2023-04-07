@@ -1,4 +1,5 @@
 const Product = require("../../model/Product/Product");
+const Category = require("../../model/Category/Category");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Product
@@ -19,16 +20,31 @@ const addProductCtrl = async (req, res, next) => {
       price,
       totalQuality,
     } = req.body;
-    if (name && description && sizes && colors && price && totalQuality) {
+    if (
+      name &&
+      description &&
+      category &&
+      sizes &&
+      colors &&
+      price &&
+      totalQuality
+    ) {
       const productFound = await Product.findOne({ name });
       if (productFound) {
         return next(appError("Sản phẩm đã tồn tại"));
       }
+      const categoryFound = await Category.findOne({
+        name: category,
+      });
+      if (!categoryFound) {
+        return next(appError("Không tìm thấy danh mục sản phẩm"));
+      }
+
       //create product
       const product = await Product.create({
         name,
         description,
-
+        category: categoryFound._id,
         sizes,
         colors,
         user,
@@ -38,6 +54,9 @@ const addProductCtrl = async (req, res, next) => {
         user: req.userAuth,
       });
       // push product to category
+      categoryFound.products.push(product._id);
+      // resave
+      await categoryFound.save();
       // send response
       res.json({
         status: "success",
