@@ -17,7 +17,7 @@ productRoutes.post("/", isLogin, addProductCtrl);
 productRoutes.get("/", getAllProductCtrl);
 
 //GET/Products/:id
-productRoutes.get("/:id", isLogin, getProductByIdCtrl);
+productRoutes.get("/:id", getProductByIdCtrl);
 
 //DELETE/Products/
 productRoutes.delete("/:id", isLogin, deleteProductCtrl);

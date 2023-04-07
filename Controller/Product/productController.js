@@ -7,44 +7,48 @@ const { appError, notFound } = require("../../Middlewares/appError");
 
 const addProductCtrl = async (req, res, next) => {
   //check Product exits
-  const {
-    name,
-    description,
-    category,
-    sizes,
-    colors,
-    user,
-    brand,
-    price,
-    totalQuality,
-  } = req.body;
-  if (name && description && sizes && colors && price && totalQuality) {
-    const productFound = await Product.findOne({ name });
-    if (productFound) {
-      return next(appError("Sản phẩm đã tồn tại"));
-    }
-    //create product
-    const product = await Product.create({
+  try {
+    const {
       name,
       description,
-
+      category,
       sizes,
       colors,
       user,
       brand,
       price,
       totalQuality,
-      user: req.userAuth,
-    });
-    // push product to category
-    // send response
-    res.json({
-      status: "success",
-      message: "Product create successfully",
-      data: product,
-    });
-  } else {
-    return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+    } = req.body;
+    if (name && description && sizes && colors && price && totalQuality) {
+      const productFound = await Product.findOne({ name });
+      if (productFound) {
+        return next(appError("Sản phẩm đã tồn tại"));
+      }
+      //create product
+      const product = await Product.create({
+        name,
+        description,
+
+        sizes,
+        colors,
+        user,
+        brand,
+        price,
+        totalQuality,
+        user: req.userAuth,
+      });
+      // push product to category
+      // send response
+      res.json({
+        status: "success",
+        message: "Thêm mới sản phẩm thành công !",
+        data: product,
+      });
+    } else {
+      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+    }
+  } catch (error) {
+    return next(appError(error.message));
   }
 };
 
@@ -98,11 +102,29 @@ const getAllProductCtrl = async (req, res, next) => {
 
     productQuery = productQuery.skip(startIndex).limit(limit);
 
+    //pagination result
+    const pagination = {};
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit,
+      };
+    }
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit,
+      };
+    }
     //await query
     const products = await productQuery;
     if (products) {
       res.json({
         status: "success",
+        total,
+        result: products.length,
+        pagination,
+        message: "Tìm kiếm sản phẩm thành công !",
         products: products,
       });
     }
@@ -116,9 +138,19 @@ const getAllProductCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getProductByIdCtrl = async (req, res, next) => {
-  res.json({
-    msg: "Get Product By ID",
-  });
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      next(appError("Không tìm thấy sản phẩm !"));
+    }
+    res.json({
+      product,
+      status: "success",
+      message: "Tìm kiếm sản phẩm thành công !",
+    });
+  } catch (error) {
+    next(appError("Không tìm thấy sản phẩm !"));
+  }
 };
 
 //@desc Update Product
@@ -126,9 +158,41 @@ const getProductByIdCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const updateProductCtrl = async (req, res, next) => {
-  res.json({
-    msg: "Update Product",
-  });
+  try {
+    const {
+      name,
+      description,
+      category,
+      sizes,
+      colors,
+      user,
+      brand,
+      price,
+      totalQuality,
+    } = req.body;
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        description,
+        category,
+        sizes,
+        colors,
+        user,
+        brand,
+        price,
+        totalQuality,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.json({
+      message: "Cập nhật sản phẩm thành công !",
+      status: "success",
+    });
+  } catch (error) {}
 };
 
 //@desc Delete Product
@@ -136,9 +200,15 @@ const updateProductCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const deleteProductCtrl = async (req, res, next) => {
-  res.json({
-    msg: "Delete Product",
-  });
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    res.json({
+      message: "Xóa sản phẩm thành công !",
+      status: "success",
+    });
+  } catch (error) {
+    return next(appError(error.message));
+  }
 };
 
 module.exports = {
