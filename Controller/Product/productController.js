@@ -1,5 +1,6 @@
 const Product = require("../../model/Product/Product");
 const Category = require("../../model/Category/Category");
+const Brand = require("../../model/Brand/Brand");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Product
@@ -27,18 +28,29 @@ const addProductCtrl = async (req, res, next) => {
       sizes &&
       colors &&
       price &&
-      totalQuality
+      totalQuality &&
+      brand
     ) {
+      // find Product
       const productFound = await Product.findOne({ name });
       if (productFound) {
         return next(appError("Sản phẩm đã tồn tại"));
       }
+      // find Category
       const categoryFound = await Category.findOne({
         name: category,
       });
       if (!categoryFound) {
         return next(appError("Không tìm thấy danh mục sản phẩm"));
       }
+      // find Brand
+      const brandFound = await Brand.findOne({
+        name: brand,
+      });
+      if (!brandFound) {
+        return next(appError("Không tìm thấy nhãn hàng"));
+      }
+      //find Color
 
       //create product
       const product = await Product.create({
@@ -47,21 +59,26 @@ const addProductCtrl = async (req, res, next) => {
         category: categoryFound._id,
         sizes,
         colors,
-        user,
-        brand,
+        brand: brandFound._id,
         price,
         totalQuality,
         user: req.userAuth,
       });
+
+      // push product  to brand
+      brandFound.products.push(product._id);
+
       // push product to category
       categoryFound.products.push(product._id);
       // resave
+      await brandFound.save();
       await categoryFound.save();
+
       // send response
       res.json({
         status: "success",
         message: "Thêm mới sản phẩm thành công !",
-        data: product,
+        product,
       });
     } else {
       return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
@@ -136,12 +153,16 @@ const getAllProductCtrl = async (req, res, next) => {
       };
     }
     //await query
-    const products = await productQuery;
+    const products = await productQuery
+      .populate("brand")
+      .populate("reviews")
+      .populate("category");
+
     if (products) {
       res.json({
         status: "success",
         total,
-        result: products.length,
+        result: products?.length,
         pagination,
         message: "Tìm kiếm sản phẩm thành công !",
         products: products,

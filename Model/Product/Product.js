@@ -13,7 +13,8 @@ const ProductSchema = new Schema(
       require: true,
     },
     brand: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
       require: true,
     },
     category: {
@@ -69,6 +70,24 @@ const ProductSchema = new Schema(
   }
 );
 
+// set virtual
+//total rating
+ProductSchema.virtual("totalReviews").get(function () {
+  const product = this;
+  return product?.reviews?.length;
+});
+
+ProductSchema.virtual("totalRating").get(function () {
+  const product = this;
+  let totalRating = 0;
+  product.reviews?.forEach((review) => {
+    totalRating += review.rating;
+  });
+  //calc avarage rating
+  const avarageRating = totalRating / product.reviews.length;
+
+  return avarageRating;
+});
 //compile Schema
 
 const Product =
