@@ -1,4 +1,5 @@
 const express = require("express");
+const userRoutes = express.Router();
 const {
   userRegisterCtrl,
   userLoginCtrl,
@@ -8,10 +9,18 @@ const {
   deleteUserCtrl,
   getUserProfileCtrl,
   updateShippingAddressCtrl,
+  uploadPhotoProfileCtrl,
+  updatePasswordUserCtrl,
+  resetPasswordUserCtrl,
+  blockUserCtrl,
+  unblockUserCtrl,
+  adminDashboardCtrl,
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
-const userRoutes = express.Router();
+const storage = require("../../config/upload-profile-image");
+const multer = require("multer");
+const upload = multer({ storage });
 
 //users/register
 userRoutes.post("/register", userRegisterCtrl);
@@ -25,16 +34,39 @@ userRoutes.get("/", isLogin, getAllUserCtrl);
 //GET/users/:id
 userRoutes.get("/:id", isLogin, getUserByIdCtrl);
 
-//DELETE/users/
+//DELETE/users/ Xóa tài khoản
 userRoutes.delete("/:id", isLogin, deleteUserCtrl);
 
 //UPDATE/users/
 userRoutes.put("/:id", isLogin, updateUserCtrl);
 
 //GET/users/profile
-userRoutes.get("/profile", isLogin, getUserProfileCtrl);
+userRoutes.get("/profile/:id", isLogin, getUserProfileCtrl);
 
 //UPDATE/shipping Address/
 userRoutes.put("/update/shippingAddress", isLogin, updateShippingAddressCtrl);
+
+//UPDATE Photo
+userRoutes.post(
+  "/profile-photo-upload",
+  isLogin,
+  upload.single("profile"),
+  uploadPhotoProfileCtrl
+);
+
+//PUT /User change password
+userRoutes.put("/password/update", isLogin, updatePasswordUserCtrl);
+
+//GET /User reset password
+userRoutes.get("/password/reset", resetPasswordUserCtrl);
+
+//PUT /Admin block user
+userRoutes.put("/block-user/:id", isLogin, isAdmin, blockUserCtrl);
+
+//PUT /Admin unblock user
+userRoutes.put("/unblock-user/:id", isLogin, isAdmin, unblockUserCtrl);
+
+//GET /Admin unblock user
+userRoutes.get("/admins/dashboard", isLogin, isAdmin, adminDashboardCtrl);
 
 module.exports = userRoutes;

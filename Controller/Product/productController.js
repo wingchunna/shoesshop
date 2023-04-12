@@ -228,11 +228,13 @@ const updateProductCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
-    res.json({
+    res.status(201).json({
       message: "Cập nhật sản phẩm thành công !",
       status: "success",
     });
-  } catch (error) {}
+  } catch (error) {
+    return next(appError(error.message), 500);
+  }
 };
 
 //@desc Delete Product
@@ -242,18 +244,57 @@ const updateProductCtrl = async (req, res, next) => {
 const deleteProductCtrl = async (req, res, next) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) {
+      return next(appError("Sản phẩm không tồn tại"), 403);
+    }
     res.json({
       message: "Xóa sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message), 500);
   }
 };
 
-//@desc Update Product
+//@desc Update Product Image
 //@route PUT /api/v1/Products/:id
 //@access Private/Admin
+
+//upload Photo
+const uploadPhotoProductCtrl = async (req, res, next) => {
+  try {
+    //find the product to be update
+    const product = await Product.findById(req.params.id);
+    // check if user is found
+    if (!product) {
+      return next(appError("Sản phẩm không tồn tại !", 403));
+    }
+
+    // check if product is updating their photo
+    if (req.files) {
+      // update profile photo
+      await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            images: req.files.path,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      await res.json({
+        status: "success",
+        data: "Cập nhật avatar thành công !",
+      });
+    } else {
+      next(appError("file không tồn tại", 403));
+    }
+  } catch (error) {
+    next(appError(error.message, 500));
+  }
+};
 
 module.exports = {
   addProductCtrl,
@@ -261,4 +302,5 @@ module.exports = {
   getProductByIdCtrl,
   updateProductCtrl,
   deleteProductCtrl,
+  uploadPhotoProductCtrl,
 };

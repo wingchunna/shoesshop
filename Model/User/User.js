@@ -16,6 +16,14 @@ const userSchema = new Schema(
       type: String,
       require: true,
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    profilePhoto: {
+      type: String,
+      required: [true, "Profile is required"],
+    },
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,

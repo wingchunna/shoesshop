@@ -10,6 +10,7 @@ const brandRoutes = require("../Routes/brands/brandRoute");
 const colorRoutes = require("../Routes/colors/colorRoute");
 const reviewRoutes = require("../Routes/reviews/reviewRoute");
 const orderRoutes = require("../Routes/orders/orderRoute");
+const couponRoutes = require("../Routes/coupons/couponRoute");
 app.use(express.json());
 
 //Routes
@@ -27,6 +28,8 @@ app.use("/api/v1/colors", colorRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 //Order Routes
 app.use("/api/v1/orders", orderRoutes);
+//Coupon Routes
+app.use("/api/v1/coupons", couponRoutes);
 
 app.get("/favicon.ico", (req, res) => {
   res.sendStatus(404);

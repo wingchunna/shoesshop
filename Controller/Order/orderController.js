@@ -2,6 +2,7 @@ const Order = require("../../model/Order/Order");
 const { appError, notFound } = require("../../Middlewares/appError");
 const User = require("../../model/User/User");
 const Product = require("../../model/Product/Product");
+const Coupon = require("../../model/Coupon/Coupon");
 const sortObject = require("../../Utils/sortObject");
 const moment = require("moment");
 const crypto = require("crypto");
@@ -22,6 +23,22 @@ const addOrderCtrl = async (req, res, next) => {
   try {
     //check payload
     const { orderItems, shippingAddress, totalPrice } = req.body;
+    const { coupon } = req?.query;
+
+    // kiểm tra coupon
+    const couponFound = await Coupon.findOne({
+      code: coupon?.toUpperCase(),
+    });
+    if (couponFound?.isExpired) {
+      return next(appError("Coupon đã hết hạn sử dụng"));
+    }
+    if (!couponFound) {
+      return next(appError("Coupon không tồn tại"));
+    }
+
+    // get discount
+    const discount = couponFound?.discount / 100;
+
     const userToken = getTokenFromHeader(req);
     //find user
     const user = await User.findById(req.userAuth);
@@ -45,8 +62,9 @@ const addOrderCtrl = async (req, res, next) => {
       user: user?._id,
       orderItems,
       shippingAddress,
-      totalPrice,
+      totalPrice: couponFound ? totalPrice - totalPrice * discount : totalPrice,
     });
+    console.log(order);
     // push order into user
     user?.orders.push(order?._id);
     await user.save();
@@ -70,7 +88,7 @@ const addOrderCtrl = async (req, res, next) => {
     const createPaymentUrl = process.env.CREATE_PAYMENT_URL;
     const getIpnUrl = process.env.GET_IPN_URL;
     const data = {
-      amount: totalPrice,
+      amount: couponFound ? totalPrice - totalPrice * discount : totalPrice,
       bankCode: "NCB",
       // dùng để xác thực và tìm kiếm mã đơn hàng
       myOrderId: order?._id,
@@ -512,25 +530,21 @@ const getVNPayIpnCtrl = async (req, res, next) => {
                   runValidators: true,
                 }
               );
-              res
-                .status(200)
-                .json({
-                  RspCode: "00",
-                  Message: "Bạn đã thanh toán thành công !",
-                  status: "success",
-                });
+              res.status(200).json({
+                RspCode: "00",
+                Message: "Bạn đã thanh toán thành công !",
+                status: "success",
+              });
             } else {
               //that bai
               //paymentStatus = '2'
               // Ở đây cập nhật trạng thái /giao dịch thanh toán thất bại vào CSDL của bạn
 
-              res
-                .status(200)
-                .json({
-                  RspCode: "00",
-                  Message: "Cập nhật đơn hàng vào CSDL thất bại",
-                  status: "success",
-                });
+              res.status(200).json({
+                RspCode: "00",
+                Message: "Cập nhật đơn hàng vào CSDL thất bại",
+                status: "success",
+              });
             }
           } else {
             res.status(200).json({
@@ -540,22 +554,18 @@ const getVNPayIpnCtrl = async (req, res, next) => {
             });
           }
         } else {
-          res
-            .status(200)
-            .json({
-              RspCode: "04",
-              Message: "Số tiền không hợp lệ",
-              status: "success",
-            });
-        }
-      } else {
-        res
-          .status(200)
-          .json({
-            RspCode: "01",
-            Message: "Không tìm thấy đơn hàng",
+          res.status(200).json({
+            RspCode: "04",
+            Message: "Số tiền không hợp lệ",
             status: "success",
           });
+        }
+      } else {
+        res.status(200).json({
+          RspCode: "01",
+          Message: "Không tìm thấy đơn hàng",
+          status: "success",
+        });
       }
     } else {
       res
