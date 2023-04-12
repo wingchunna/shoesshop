@@ -28,6 +28,10 @@ app.use("/api/v1/reviews", reviewRoutes);
 //Order Routes
 app.use("/api/v1/orders", orderRoutes);
 
+app.get("/favicon.ico", (req, res) => {
+  res.sendStatus(404);
+});
+
 app.use(notFound);
 //error middlewares
 

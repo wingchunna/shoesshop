@@ -7,6 +7,7 @@ const {
   updateUserCtrl,
   deleteUserCtrl,
   getUserProfileCtrl,
+  updateShippingAddressCtrl,
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -32,5 +33,8 @@ userRoutes.put("/:id", isLogin, updateUserCtrl);
 
 //GET/users/profile
 userRoutes.get("/profile", isLogin, getUserProfileCtrl);
+
+//UPDATE/shipping Address/
+userRoutes.put("/update/shippingAddress", isLogin, updateShippingAddressCtrl);
 
 module.exports = userRoutes;

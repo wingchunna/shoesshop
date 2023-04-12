@@ -54,14 +54,14 @@ const ProductSchema = new Schema(
       type: Number,
       require: true,
     },
-    totalQuality: {
+    totalQuantity: {
       type: Number,
       require: true,
     },
     totalSold: {
       type: Number,
-      require: true,
       default: 0,
+      require: true,
     },
   },
   {
@@ -71,12 +71,19 @@ const ProductSchema = new Schema(
 );
 
 // set virtual
-//total rating
+
+// cal total product left
+ProductSchema.virtual("totalItemLeft").get(function () {
+  const product = this;
+  return product?.totalQuantity - product?.totalSold;
+});
+
+// total reviews
 ProductSchema.virtual("totalReviews").get(function () {
   const product = this;
   return product?.reviews?.length;
 });
-
+//total rating
 ProductSchema.virtual("totalRating").get(function () {
   const product = this;
   let totalRating = 0;

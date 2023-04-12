@@ -19,7 +19,7 @@ const addProductCtrl = async (req, res, next) => {
       user,
       brand,
       price,
-      totalQuality,
+      totalQuantity,
     } = req.body;
     if (
       name &&
@@ -28,7 +28,7 @@ const addProductCtrl = async (req, res, next) => {
       sizes &&
       colors &&
       price &&
-      totalQuality &&
+      totalQuantity &&
       brand
     ) {
       // find Product
@@ -61,7 +61,7 @@ const addProductCtrl = async (req, res, next) => {
         colors,
         brand: brandFound._id,
         price,
-        totalQuality,
+        totalQuantity,
         user: req.userAuth,
       });
 
@@ -251,9 +251,12 @@ const deleteProductCtrl = async (req, res, next) => {
   }
 };
 
+//@desc Update Product
+//@route PUT /api/v1/Products/:id
+//@access Private/Admin
+
 module.exports = {
   addProductCtrl,
-
   getAllProductCtrl,
   getProductByIdCtrl,
   updateProductCtrl,

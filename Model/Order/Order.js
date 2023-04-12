@@ -6,6 +6,9 @@ const randomText = Math.random().toString(36).substring(7).toLocaleUpperCase();
 const randomNumber = Math.floor(1000 + Math.random() * 100000);
 const OrderSchema = new Schema(
   {
+    myVnpayOrderId: {
+      type: String,
+    },
     orderItems: [
       {
         type: Object,

@@ -5,6 +5,11 @@ const {
   getOrderByIdCtrl,
   updateOrderCtrl,
   deleteOrderCtrl,
+  createPaymentUrlCtrl,
+  querydrCtrl,
+  refundCtrl,
+  getVNPayIpnCtrl,
+  getVNPayReturnCtrl,
 } = require("../../Controller/Order/OrderController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -22,7 +27,22 @@ orderRoutes.get("/:id", getOrderByIdCtrl);
 //DELETE/Orders/
 orderRoutes.delete("/:id", isLogin, deleteOrderCtrl);
 
-//UPDATE/Orders/
-orderRoutes.put("/:id", isLogin, updateOrderCtrl);
+//UPDATE/Orders/ only admin
+orderRoutes.put("/:id", isLogin, isAdmin, updateOrderCtrl);
+
+//POST/Create Payment Url/
+orderRoutes.post("/payments/create_payment_url", isLogin, createPaymentUrlCtrl);
+
+//POST/Create Payment Url/
+orderRoutes.post("/payments/querydr", isLogin, querydrCtrl);
+
+//POST/refund/
+orderRoutes.post("/payments/refund", isLogin, refundCtrl);
+
+//GET/Vnpay Ipn/
+orderRoutes.get("/payments/vnpay_ipn", getVNPayIpnCtrl);
+
+//GET/Vnpay return/
+orderRoutes.get("/payments/vnpay_return", getVNPayReturnCtrl);
 
 module.exports = orderRoutes;

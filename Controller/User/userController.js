@@ -114,6 +114,51 @@ const deleteUserCtrl = async (req, res, next) => {
   });
 };
 
+//@desc Update Shipping Address
+//@route delete /api/v1/users/:id
+//@access Private/Admin
+
+const updateShippingAddressCtrl = async (req, res, next) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      address,
+      city,
+      postalCode,
+      province,
+      phone,
+      country,
+    } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.userAuth,
+      {
+        shippingAddress: {
+          firstName,
+          lastName,
+          address,
+          city,
+          postalCode,
+          province,
+          phone,
+          country,
+        },
+        hasShippingAddress: true,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.json({
+      user,
+      message: "Cập nhật địa chỉ nhận hàng thành công !",
+      status: "success",
+    });
+  } catch (error) {}
+};
+
 module.exports = {
   userRegisterCtrl,
   userLoginCtrl,
@@ -122,4 +167,5 @@ module.exports = {
   updateUserCtrl,
   deleteUserCtrl,
   getUserProfileCtrl,
+  updateShippingAddressCtrl,
 };
