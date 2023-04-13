@@ -10,6 +10,7 @@ const {
   refundCtrl,
   getVNPayIpnCtrl,
   getVNPayReturnCtrl,
+  getOrderStatsCtrl,
 } = require("../../Controller/Order/OrderController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -44,5 +45,8 @@ orderRoutes.get("/payments/vnpay_ipn", getVNPayIpnCtrl);
 
 //GET/Vnpay return/
 orderRoutes.get("/payments/vnpay_return", getVNPayReturnCtrl);
+
+//GET/Vnpay return/
+orderRoutes.get("/sales/stats", isLogin, getOrderStatsCtrl);
 
 module.exports = orderRoutes;

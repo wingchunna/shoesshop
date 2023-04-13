@@ -620,6 +620,62 @@ const getVNPayReturnCtrl = async (req, res, next) => {
   }
 };
 
+//@desc return
+//@route GET /api/v1/Orders/summary
+//@access Private/Admin
+const getOrderStatsCtrl = async (req, res, next) => {
+  try {
+    const sumOfTotalSales = await Order.aggregate([
+      { $match: { active: true } },
+      {
+        $group: {
+          _id: null,
+          totalSales: {
+            $sum: "$totalPrice",
+          },
+          minimumSale: {
+            $min: "$totalPrice",
+          },
+          maximumSale: {
+            $max: "$totalPrice",
+          },
+          avgSale: {
+            $avg: "$totalPrice",
+          },
+        },
+      },
+    ]);
+    //get the date
+    const date = new Date();
+    const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const saleToday = await Order.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: today,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSales: {
+            $sum: "$totalPrice",
+          },
+        },
+      },
+    ]);
+    res.status(201).json({
+      sumOfTotalSales,
+      saleToday,
+      status: "success",
+      message: "Sale Dashboard !",
+    });
+  } catch (error) {
+    return next(appError(error.message, 500));
+  }
+};
+
 module.exports = {
   addOrderCtrl,
   getAllOrderCtrl,
@@ -631,4 +687,5 @@ module.exports = {
   refundCtrl,
   getVNPayIpnCtrl,
   getVNPayReturnCtrl,
+  getOrderStatsCtrl,
 };
