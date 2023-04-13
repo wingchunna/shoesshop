@@ -8,17 +8,20 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addCategoryCtrl = async (req, res, next) => {
   //check Category exits
   try {
-    const { name, user, product, image } = req.body;
-    if (name && image) {
+    const { name, user, product } = req.body;
+    if (name) {
       const categoryFound = await Category.findOne({ name });
       if (categoryFound) {
-        return next(appError("Danh mục sản phẩm đã tồn tại", 403));
+        return next(appError("Danh mục sản phẩm đã tồn tại !", 403));
+      }
+      if (!req.file) {
+        return next(appError("Bạn cần upload hình ảnh !", 403));
       }
       //create Category
       const category = await Category.create({
         name,
         user: req.userAuth,
-        image: image?.path,
+        image: req?.file?.path,
       });
       // push Product to Category
       // send response
@@ -82,11 +85,14 @@ const getCategoryByIdCtrl = async (req, res, next) => {
 const updateCategoryCtrl = async (req, res, next) => {
   try {
     const { name } = req.body;
+    if (!req.file) {
+      return next(appError("Bạn cần upload hình ảnh !", 403));
+    }
     const category = await Category.findByIdAndUpdate(
       req.params.id,
       {
         name,
-        image: req.image?.path,
+        image: req.file?.path,
       },
       {
         new: true,

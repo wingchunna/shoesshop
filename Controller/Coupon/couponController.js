@@ -104,7 +104,7 @@ const getDateNow = () => {
 const getAllCouponCtrl = async (req, res, next) => {
   try {
     const coupons = await Coupon.find();
-    if (!coupon) {
+    if (!coupons) {
       return next(appError("Không tìm thấy danh sách Coupon", 403));
     }
     res.status(201).json({

@@ -8,7 +8,8 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addColorCtrl = async (req, res, next) => {
   //check Color exits
   try {
-    const { name, user, color } = req.body;
+    const { name } = req.body;
+    console.log(name);
     if (name) {
       const colorFound = await Color.findOne({ name });
       if (colorFound) {

@@ -17,7 +17,7 @@ productRoutes.post(
   "/",
   isLogin,
   isAdmin,
-  upload.array("images"),
+  upload.array("images", 5),
   addProductCtrl
 );
 
@@ -36,7 +36,7 @@ productRoutes.put(
   isLogin,
   isAdmin,
   isAdmin,
-  upload.array("images"),
+  upload.array("images", 5),
   updateProductCtrl
 );
 

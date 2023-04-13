@@ -14,12 +14,16 @@ const addBrandCtrl = async (req, res, next) => {
       if (brandFound) {
         return next(appError("Nhãn hàng đã tồn tại", 403));
       }
+      if (!req.file) {
+        return next(appError("Bạn cần upload hình ảnh", 403));
+      }
       //create Brand
       const brand = await Brand.create({
         name,
         user: req.userAuth,
-        images: image?.path,
+        images: req?.file?.path,
       });
+
       // push Product to Brand
       // send response
       res.status(201).json({
@@ -83,11 +87,14 @@ const getBrandByIdCtrl = async (req, res, next) => {
 const updateBrandCtrl = async (req, res, next) => {
   try {
     const { name } = req.body;
+    if (!req.file) {
+      return next(appError("Bạn cần upload hình ảnh", 403));
+    }
     const brand = await Brand.findByIdAndUpdate(
       req.params.id,
       {
         name,
-        images: image?.path,
+        images: req?.file?.path,
       },
       {
         new: true,

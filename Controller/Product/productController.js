@@ -16,7 +16,7 @@ const addProductCtrl = async (req, res, next) => {
       category,
       sizes,
       colors,
-      images,
+
       user,
       brand,
       price,
@@ -30,8 +30,7 @@ const addProductCtrl = async (req, res, next) => {
       colors &&
       price &&
       totalQuantity &&
-      brand &&
-      images
+      brand
     ) {
       // find Product
       const productFound = await Product.findOne({ name });
@@ -54,6 +53,14 @@ const addProductCtrl = async (req, res, next) => {
       }
       //find Color
 
+      // check image
+      if (!req.files) {
+        return next(appError("Bạn cần upload hình ảnh", 403));
+      }
+      // console.log(req.files);
+      let imagePaths = [];
+      req.files.forEach((item) => imagePaths.push(item.path));
+      // console.log(imagePaths);
       //create product
       const product = await Product.create({
         name,
@@ -65,8 +72,10 @@ const addProductCtrl = async (req, res, next) => {
         price,
         totalQuantity,
         user: req.userAuth,
-        images: images?.path,
+        images: imagePaths,
       });
+      // await product.images.push(req.files.path);
+      // await product.save();
 
       // push product  to brand
       brandFound.products.push(product._id);
@@ -214,6 +223,11 @@ const updateProductCtrl = async (req, res, next) => {
       totalQuality,
       images,
     } = req.body;
+    if (!req.files) {
+      return next(appError("Bạn cần upload ảnh", 403));
+    }
+    let imagePaths = [];
+    req.files.forEach((item) => imagePaths.push(item.path));
 
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -227,7 +241,7 @@ const updateProductCtrl = async (req, res, next) => {
         brand,
         price,
         totalQuality,
-        images: images?.path,
+        images: imagePaths,
       },
       {
         new: true,
