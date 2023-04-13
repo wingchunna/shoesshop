@@ -3,6 +3,7 @@ const { hashPassword, comparePassword } = require("../../Utils/hashPassword");
 const { appError, notFound } = require("../../Middlewares/appError");
 const generateToken = require("../../Utils/generateToken");
 const bcrypt = require("bcryptjs");
+const mailer = require("../../Utils/mailer");
 
 //@desc Register User
 //@route POST /api/v1/users/register
@@ -41,6 +42,7 @@ const userRegisterCtrl = async (req, res, next) => {
 const userLoginCtrl = async (req, res, next) => {
   const { email, password } = req.body;
   if (email && password) {
+    console.log("loggin");
     try {
       //find the user in db
       const userFound = await User.findOne({ email });
@@ -317,15 +319,61 @@ const updatePasswordUserCtrl = async (req, res, next) => {
   }
 };
 
-// reset password
 const resetPasswordUserCtrl = async (req, res, next) => {
-  let { email } = req.params.email;
+  const { email, password, retypePassword } = req.body;
+  try {
+    if (email && password && retypePassword) {
+      if (password !== retypePassword) {
+        return next(
+          appError("Mật khẩu không khớp, vui lòng kiểm tra lại !", 403)
+        );
+      }
+      const hashedPassword = await hashPassword(password);
+      // tìm kiếm user bằng email
+      const user = await User.findOneAndUpdate(
+        { email },
+        {
+          password: hashedPassword,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.status(201).json({
+        user,
+        message: "Reset mật khẩu thành công !",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần nhập đầy đủ thông tin !", 403));
+    }
+  } catch (error) {
+    return next(appError(error.message, 500));
+  }
+};
+
+// request reset password
+const reqResetPasswordCtrl = async (req, res, next) => {
+  const email = req.query.email;
+  console.log(email);
   // check email in DB
   try {
     const user = await User.findOne({ email });
     if (!user) {
       return next(appError("Email không tồn tại, vui lòng kiểm tra lại", 403));
     }
+
+    mailer.sendMail(
+      email,
+      "Reset password",
+      `<span>Đây là email từ hệ thống Shoes Shop. Bạn vừa yêu cầu reset mật khẩu.Để thực hiện thay đổi mật khẩu, vui lòng bấm vào link bên dưới</span></br><a href="${process.env.APP_URL}/api/v1/users/password/reset/${email}"> Reset Password</a>`
+    );
+    res.status(201).json({
+      message: "Gửi email reset password thành công. Vui lòng check email !",
+      status: "success",
+    });
+
     // Gửi mail reset pass
   } catch (error) {
     return next(appError(error.message, 500));
@@ -413,4 +461,5 @@ module.exports = {
   blockUserCtrl,
   unblockUserCtrl,
   adminDashboardCtrl,
+  reqResetPasswordCtrl,
 };

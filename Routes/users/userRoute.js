@@ -1,5 +1,6 @@
 const express = require("express");
 const userRoutes = express.Router();
+
 const {
   userRegisterCtrl,
   userLoginCtrl,
@@ -15,6 +16,7 @@ const {
   blockUserCtrl,
   unblockUserCtrl,
   adminDashboardCtrl,
+  reqResetPasswordCtrl,
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -22,13 +24,13 @@ const storage = require("../../config/upload-profile-images");
 const multer = require("multer");
 const upload = multer({ storage });
 
-//users/register
+//POST/users/register
 userRoutes.post("/register", userRegisterCtrl);
 
-//users/login
+//POST/users/login
 userRoutes.post("/login", userLoginCtrl);
 
-//GET/users/
+//GET/users/ get all user
 userRoutes.get("/", isLogin, getAllUserCtrl);
 
 //GET/users/:id
@@ -58,7 +60,10 @@ userRoutes.post(
 userRoutes.put("/update/password", isLogin, updatePasswordUserCtrl);
 
 //GET /User reset password
-userRoutes.get("/password/reset", resetPasswordUserCtrl);
+userRoutes.get("/password/reset-request", reqResetPasswordCtrl);
+
+//POST /User reset password
+userRoutes.post("/password/reset", resetPasswordUserCtrl);
 
 //PUT /Admin block user
 userRoutes.put("/block-user/:id", isLogin, isAdmin, blockUserCtrl);
