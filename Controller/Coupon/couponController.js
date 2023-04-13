@@ -12,26 +12,26 @@ const addCouponCtrl = async (req, res, next) => {
     if (code && discount && startDate && endDate) {
       const couponFound = await Coupon.findOne({ code });
       if (couponFound) {
-        return next(appError("Coupon đã tồn tại"));
+        return next(appError("Coupon đã tồn tại", 403));
       }
       if (isNaN(discount)) {
-        return next(appError("Discount phải là số"));
+        return next(appError("Discount phải là số", 403));
       }
       const currentDate = getDateNow();
 
       if (startDate < currentDate) {
         return next(
-          appError("Bạn phải nhập thời gian bắt đầu muộn hơn hiện tại")
+          appError("Bạn phải nhập thời gian bắt đầu muộn hơn hiện tại", 403)
         );
       }
       if (startDate >= endDate) {
         return next(
-          appError("Bạn phải nhập thời gian bắt đầu sớm hơn kết thúc")
+          appError("Bạn phải nhập thời gian bắt đầu sớm hơn kết thúc", 403)
         );
       }
       if (discount <= 0 || discount > 100) {
         return next(
-          appError("Bạn phải nhập giá trị discount trong khoảng từ 1-100")
+          appError("Bạn phải nhập giá trị discount trong khoảng từ 1-100", 403)
         );
       }
 
@@ -54,10 +54,10 @@ const addCouponCtrl = async (req, res, next) => {
         message: "Thêm mới coupon thành công !",
       });
     } else {
-      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm", 403));
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -104,14 +104,16 @@ const getDateNow = () => {
 const getAllCouponCtrl = async (req, res, next) => {
   try {
     const coupons = await Coupon.find();
-
-    res.json({
+    if (!coupon) {
+      return next(appError("Không tìm thấy danh sách Coupon", 403));
+    }
+    res.status(201).json({
       coupons,
       status: "success",
       message: "Tìm kiếm danh sách Coupon thành công !",
     });
   } catch (error) {
-    next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -123,15 +125,15 @@ const getCouponByIdCtrl = async (req, res, next) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) {
-      next(appError("Không tìm thấy Coupon !"));
+      next(appError("Không tìm thấy Coupon !", 403));
     }
-    res.json({
+    res.status(201).json({
       coupon,
       status: "success",
       message: "Tìm kiếm Coupon thành công !",
     });
   } catch (error) {
-    next(appError("Không tìm thấy Coupon !"));
+    next(appError("Không tìm thấy Coupon !", 500));
   }
 };
 
@@ -145,26 +147,26 @@ const updateCouponCtrl = async (req, res, next) => {
     if (code && discount && startDate && endDate) {
       const couponFound = await Coupon.findOne({ code });
       if (couponFound) {
-        return next(appError("Coupon đã tồn tại"));
+        return next(appError("Coupon đã tồn tại", 403));
       }
       if (isNaN(discount)) {
-        return next(appError("Discount phải là số"));
+        return next(appError("Discount phải là số", 403));
       }
       const currentDate = getDateNow();
 
       if (startDate < currentDate) {
         return next(
-          appError("Bạn phải nhập thời gian bắt đầu muộn hơn hiện tại")
+          appError("Bạn phải nhập thời gian bắt đầu muộn hơn hiện tại", 403)
         );
       }
       if (startDate >= endDate) {
         return next(
-          appError("Bạn phải nhập thời gian bắt đầu sớm hơn kết thúc")
+          appError("Bạn phải nhập thời gian bắt đầu sớm hơn kết thúc", 403)
         );
       }
       if (discount <= 0 || discount > 100) {
         return next(
-          appError("Bạn phải nhập giá trị discount trong khoảng từ 1-100")
+          appError("Bạn phải nhập giá trị discount trong khoảng từ 1-100", 403)
         );
       }
 
@@ -184,15 +186,15 @@ const updateCouponCtrl = async (req, res, next) => {
           runValidators: true,
         }
       );
-      res.json({
+      res.status(201).json({
         message: "Cập nhật danh mục sản phẩm thành công !",
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm", 403));
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -203,12 +205,12 @@ const updateCouponCtrl = async (req, res, next) => {
 const deleteCouponCtrl = async (req, res, next) => {
   try {
     const coupon = await Coupon.findByIdAndDelete(req.params.id);
-    res.json({
+    res.status(201).json({
       message: "Xóa danh mục sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 

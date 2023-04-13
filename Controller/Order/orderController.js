@@ -30,10 +30,10 @@ const addOrderCtrl = async (req, res, next) => {
       code: coupon?.toUpperCase(),
     });
     if (couponFound?.isExpired) {
-      return next(appError("Coupon đã hết hạn sử dụng"));
+      return next(appError("Coupon đã hết hạn sử dụng", 403));
     }
     if (!couponFound) {
-      return next(appError("Coupon không tồn tại"));
+      return next(appError("Coupon không tồn tại", 403));
     }
 
     // get discount
@@ -44,18 +44,18 @@ const addOrderCtrl = async (req, res, next) => {
     const user = await User.findById(req.userAuth);
 
     if (!user) {
-      return next(appError("Bạn cần đăng nhập để đặt hàng"));
+      return next(appError("Bạn cần đăng nhập để đặt hàng", 403));
     }
     //check if order is not empty
     if (orderItems?.length <= 0) {
-      return next(appError("Không có sản phẩm trong giỏ hàng"));
+      return next(appError("Không có sản phẩm trong giỏ hàng", 403));
     }
     if (Object.keys(shippingAddress).length === 0) {
-      return next(appError("Bạn cần nhập thông tin địa chỉ"));
+      return next(appError("Bạn cần nhập thông tin địa chỉ", 403));
     }
     //check if user has shipping address
     if (!user?.hasShippingAddress) {
-      return next(appError("Bạn chưa có địa chỉ nhận hàng"));
+      return next(appError("Bạn chưa có địa chỉ nhận hàng", 403));
     }
     //place/create order
     const order = await Order.create({
@@ -64,7 +64,7 @@ const addOrderCtrl = async (req, res, next) => {
       shippingAddress,
       totalPrice: couponFound ? totalPrice - totalPrice * discount : totalPrice,
     });
-    console.log(order);
+
     // push order into user
     user?.orders.push(order?._id);
     await user.save();
@@ -80,6 +80,8 @@ const addOrderCtrl = async (req, res, next) => {
         if (product) {
           product.totalSold += item.itemBuy;
           await product.save();
+        } else {
+          return next(appError("Không tìm thấy sản phẩm !", 403));
         }
       })
     );
@@ -128,7 +130,7 @@ const addOrderCtrl = async (req, res, next) => {
     //   user,
     // });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -139,12 +141,15 @@ const addOrderCtrl = async (req, res, next) => {
 const getAllOrderCtrl = async (req, res, next) => {
   try {
     const orders = await Order.find();
-
-    res.json({
-      orders,
-      status: "success",
-      message: "Tìm kiếm đơn hàng thành công !",
-    });
+    if (orders) {
+      res.status(201).json({
+        orders,
+        status: "success",
+        message: "Tìm kiếm đơn hàng thành công !",
+      });
+    } else {
+      return next(appError("Không tìm thấy danh sách đơn hàng !", 403));
+    }
   } catch (error) {
     next(appError(error.message));
   }
@@ -158,15 +163,15 @@ const getOrderByIdCtrl = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) {
-      next(appError("Không tìm thấy đơn hàng !"));
+      next(appError("Không tìm thấy đơn hàng !", 403));
     }
-    res.json({
+    res.status(201).json({
       order,
       status: "success",
       message: "Tìm kiếm đơn hàng thành công !",
     });
   } catch (error) {
-    next(appError("Không tìm thấy đơn hàng !"));
+    next(appError("Không tìm thấy đơn hàng !", 500));
   }
 };
 
@@ -188,12 +193,13 @@ const updateOrderCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
-    res.json({
+    res.status(201).json({
+      order,
       message: "Cập nhật trạng thái đơn hàng thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -204,12 +210,12 @@ const updateOrderCtrl = async (req, res, next) => {
 const deleteOrderCtrl = async (req, res, next) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
-    res.json({
+    res.status(201).json({
       message: "Xóa đơn hàng thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -281,14 +287,14 @@ const createPaymentUrlCtrl = async (req, res, next) => {
     await order.save();
 
     // gửi thông báo
-    res.json({
+    res.status(201).json({
       vnpUrl,
       message:
         "Tạo link thanh toán thành công, mời quý khách nhập số tài khoản để thanh toán",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -365,17 +371,17 @@ const querydrCtrl = async (req, res, next) => {
       headers: { "Content-Type": "application/json" },
     })
       .then(function (response) {
-        res.json({
+        res.status(201).json({
           data: response.data,
           message: "Query DR thành công !",
           status: "success",
         });
       })
       .catch(function (error) {
-        console.log(error);
+        return next(appError(error.message, 500));
       });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -463,17 +469,17 @@ const refundCtrl = async (req, res, next) => {
       headers: { "Content-Type": "application/json" },
     })
       .then(function (response) {
-        res.json({
+        res.status(201).json({
           data: response.data,
           message: "Refund",
           status: "success",
         });
       })
       .catch(function (error) {
-        console.log(error);
+        return next(appError(error.message, 500));
       });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -530,7 +536,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
                   runValidators: true,
                 }
               );
-              res.status(200).json({
+              res.status(201).json({
                 RspCode: "00",
                 Message: "Bạn đã thanh toán thành công !",
                 status: "success",
@@ -540,28 +546,28 @@ const getVNPayIpnCtrl = async (req, res, next) => {
               //paymentStatus = '2'
               // Ở đây cập nhật trạng thái /giao dịch thanh toán thất bại vào CSDL của bạn
 
-              res.status(200).json({
+              res.status(201).json({
                 RspCode: "00",
                 Message: "Cập nhật đơn hàng vào CSDL thất bại",
                 status: "success",
               });
             }
           } else {
-            res.status(200).json({
+            res.status(201).json({
               RspCode: "02",
               Message: "Cập nhật đơn hàng thành công",
               status: "success",
             });
           }
         } else {
-          res.status(200).json({
+          res.status(201).json({
             RspCode: "04",
             Message: "Số tiền không hợp lệ",
             status: "success",
           });
         }
       } else {
-        res.status(200).json({
+        res.status(201).json({
           RspCode: "01",
           Message: "Không tìm thấy đơn hàng",
           status: "success",
@@ -569,11 +575,11 @@ const getVNPayIpnCtrl = async (req, res, next) => {
       }
     } else {
       res
-        .status(200)
+        .status(201)
         .json({ RspCode: "97", Message: "Mã xác thực lỗi", status: "success" });
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -599,18 +605,18 @@ const getVNPayReturnCtrl = async (req, res, next) => {
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
 
-      res.json({
+      res.status(201).json({
         status: "success",
         code: vnp_params["vnp_ResponseCode"],
       });
     } else {
-      res.json({
+      res.status(201).json({
         status: "success",
         code: "97",
       });
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 

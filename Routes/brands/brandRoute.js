@@ -8,10 +8,13 @@ const {
 } = require("../../Controller/Brand/BrandController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
+const storage = require("../../config/upload-brand-images");
+const multer = require("multer");
+const upload = multer({ storage });
 const brandRoutes = express.Router();
 
 //Brand/add
-brandRoutes.post("/", isLogin, addBrandCtrl);
+brandRoutes.post("/", isLogin, isAdmin, upload.single("image"), addBrandCtrl);
 
 //GET/Brand/
 brandRoutes.get("/", getAllBrandCtrl);
@@ -20,9 +23,15 @@ brandRoutes.get("/", getAllBrandCtrl);
 brandRoutes.get("/:id", getBrandByIdCtrl);
 
 //DELETE/Brand/
-brandRoutes.delete("/:id", isLogin, deleteBrandCtrl);
+brandRoutes.delete("/:id", isLogin, isAdmin, deleteBrandCtrl);
 
 //UPDATE/Brand/
-brandRoutes.put("/:id", isLogin, updateBrandCtrl);
+brandRoutes.put(
+  "/:id",
+  isLogin,
+  isAdmin,
+  upload.single("image"),
+  updateBrandCtrl
+);
 
 module.exports = brandRoutes;

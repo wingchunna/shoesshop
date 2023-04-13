@@ -12,7 +12,7 @@ const addColorCtrl = async (req, res, next) => {
     if (name) {
       const colorFound = await Color.findOne({ name });
       if (colorFound) {
-        return next(appError("Danh mục màu sắc sản phẩm đã tồn tại"));
+        return next(appError("Danh mục màu sắc sản phẩm đã tồn tại", 403));
       }
       //create Color
       const color = await Color.create({
@@ -21,16 +21,16 @@ const addColorCtrl = async (req, res, next) => {
       });
       // push Color to Color
       // send response
-      res.json({
+      res.status(201).json({
         data: color,
         status: "success",
         message: "Thêm mới màu sắc sản phẩm thành công !",
       });
     } else {
-      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm", 403));
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -41,14 +41,17 @@ const addColorCtrl = async (req, res, next) => {
 const getAllColorCtrl = async (req, res, next) => {
   try {
     const colors = await Color.find();
+    if (!colors) {
+      next(appError("Không tìm thấy danh sách màu sắc", 403));
+    }
 
-    res.json({
+    res.status(201).json({
       colors,
       status: "success",
       message: "Tìm kiếm màu sắc sản phẩm thành công !",
     });
   } catch (error) {
-    next(appError(error.message));
+    next(appError(error.message, 500));
   }
 };
 
@@ -60,15 +63,15 @@ const getColorByIdCtrl = async (req, res, next) => {
   try {
     const color = await Color.findById(req.params.id);
     if (!color) {
-      next(appError("Không tìm thấy màu sắc sản phẩm !"));
+      next(appError("Không tìm thấy màu sắc sản phẩm !", 403));
     }
-    res.json({
+    res.status(201).json({
       color,
       status: "success",
       message: "Tìm kiếm màu sắc sản phẩm thành công !",
     });
   } catch (error) {
-    next(appError("Không tìm thấy màu sắc sản phẩm !"));
+    next(appError("Không tìm thấy màu sắc sản phẩm !", 500));
   }
 };
 
@@ -89,12 +92,12 @@ const updateColorCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
-    res.json({
+    res.status(201).json({
       message: "Cập nhật màu sắc sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -105,12 +108,12 @@ const updateColorCtrl = async (req, res, next) => {
 const deleteColorCtrl = async (req, res, next) => {
   try {
     const color = await color.findByIdAndDelete(req.params.id);
-    res.json({
+    res.status(201).json({
       message: "Xóa màu sắc sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 

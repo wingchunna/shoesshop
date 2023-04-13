@@ -18,7 +18,7 @@ const {
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
-const storage = require("../../config/upload-profile-image");
+const storage = require("../../config/upload-profile-images");
 const multer = require("multer");
 const upload = multer({ storage });
 
@@ -35,27 +35,27 @@ userRoutes.get("/", isLogin, getAllUserCtrl);
 userRoutes.get("/:id", isLogin, getUserByIdCtrl);
 
 //DELETE/users/ Xóa tài khoản
-userRoutes.delete("/:id", isLogin, deleteUserCtrl);
+userRoutes.delete("/", isLogin, deleteUserCtrl);
 
 //UPDATE/users/
 userRoutes.put("/:id", isLogin, updateUserCtrl);
 
 //GET/users/profile
-userRoutes.get("/profile/:id", isLogin, getUserProfileCtrl);
+userRoutes.get("/profile/get-profile", isLogin, getUserProfileCtrl);
 
 //UPDATE/shipping Address/
-userRoutes.put("/update/shippingAddress", isLogin, updateShippingAddressCtrl);
+userRoutes.put("/update/shipping-address", isLogin, updateShippingAddressCtrl);
 
 //UPDATE Photo
 userRoutes.post(
-  "/profile-photo-upload",
+  "/update/profile-photo-upload",
   isLogin,
   upload.single("profile"),
   uploadPhotoProfileCtrl
 );
 
 //PUT /User change password
-userRoutes.put("/password/update", isLogin, updatePasswordUserCtrl);
+userRoutes.put("/update/password", isLogin, updatePasswordUserCtrl);
 
 //GET /User reset password
 userRoutes.get("/password/reset", resetPasswordUserCtrl);

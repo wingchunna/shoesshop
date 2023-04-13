@@ -14,7 +14,7 @@ const userRegisterCtrl = async (req, res, next) => {
   if (email && fullname && password) {
     const userExits = await User.findOne({ email });
     if (userExits) {
-      return next(appError("Tài khoản đã tồn tại !"), 403);
+      return next(appError("Tài khoản đã tồn tại !", 403));
     }
     // hash password
     const hashedPassword = await hashPassword(password);
@@ -25,11 +25,12 @@ const userRegisterCtrl = async (req, res, next) => {
       password: hashedPassword,
     });
     res.status(201).json({
-      msg: "Đăng ký tài khoản thành công !",
-      data: user,
+      user,
+      message: "Đăng ký tài khoản thành công !",
+      status: "success",
     });
   } else {
-    return next(appError("Bạn cần nhập đầy đủ thông tin !"), 500);
+    return next(appError("Bạn cần nhập đầy đủ thông tin !", 500));
   }
 };
 
@@ -45,8 +46,10 @@ const userLoginCtrl = async (req, res, next) => {
       const userFound = await User.findOne({ email });
       if (!userFound) {
         return next(
-          appError("Tài khoản hoặc mật khẩu không đúng, vui lòng thử lại !"),
-          403
+          appError(
+            "Tài khoản hoặc mật khẩu không đúng, vui lòng thử lại !",
+            403
+          )
         );
       }
       // verify password
@@ -56,26 +59,28 @@ const userLoginCtrl = async (req, res, next) => {
       );
       if (!isPassMatched) {
         return next(
-          appError("Tài khoản hoặc mật khẩu không đúng, vui lòng thử lại !"),
-          403
+          appError(
+            "Tài khoản hoặc mật khẩu không đúng, vui lòng thử lại !",
+            403
+          )
         );
       }
       if (userFound.isBlocked) {
         return next(
           appError(
-            "Tài khoản đang bị tạm khóa do vi phạm chính sách, vui lòng liên hệ admin để được hỗ trợ !"
-          ),
-          403
+            "Tài khoản đang bị tạm khóa do vi phạm chính sách, vui lòng liên hệ admin để được hỗ trợ !",
+            403
+          )
         );
       }
       res.status(201).json({
+        user: userFound,
+        token: generateToken(userFound?._id),
         message: "Đăng nhập thành công",
         status: "success",
-        data: userFound,
-        token: generateToken(userFound?._id),
       });
     } catch (error) {
-      return next(appError(error.message), 500);
+      return next(appError(error.message, 500));
     }
   }
 };
@@ -91,13 +96,13 @@ const getUserProfileCtrl = async (req, res, next) => {
     if (!user) {
       return next(appError("Không tìm thấy user", 403));
     }
-    res.json({
+    res.status(201).json({
       user,
       message: "Truy vấn profile thành công",
       status: "success",
     });
   } catch (error) {
-    next(appError("Không thể xem user profile"));
+    next(appError("Không thể xem user profile", 500));
   }
 };
 
@@ -112,13 +117,13 @@ const getAllUserCtrl = async (req, res, next) => {
     if (!users) {
       return next(appError("Không tìm thấy user", 403));
     }
-    res.json({
+    res.status(201).json({
       users,
       message: "Truy vấn danh sách users thành công",
       status: "success",
     });
   } catch (error) {
-    next(appError("Không thể lấy danh sách users"));
+    next(appError(error.message, 500));
   }
 };
 
@@ -132,7 +137,7 @@ const getUserByIdCtrl = async (req, res, next) => {
     if (!user) {
       return next(appError("Không tìm thấy user", 403));
     }
-    res.json({
+    res.status(201).json({
       user,
       message: "Truy vấn user thành công",
       status: "success",
@@ -148,12 +153,21 @@ const getUserByIdCtrl = async (req, res, next) => {
 
 const updateUserCtrl = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return next(appError("Không tìm thấy user", 403));
-    }
-    res.json({
-      msg: "Update User",
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        fullname: req?.body?.fullname,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(201).json({
+      user,
+      message: "Cập nhật thông tin User thành công !",
+      status: "success",
     });
   } catch (error) {
     return next(appError(error.message, 500));
@@ -166,12 +180,11 @@ const updateUserCtrl = async (req, res, next) => {
 
 const deleteUserCtrl = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userAuth);
-    if (!user) {
-      return next(appError("Không tìm thấy user", 403));
-    }
-    res.json({
-      msg: "Delete User",
+    const user = await User.findByIdAndDelete(req.userAuth);
+
+    res.status(201).json({
+      message: "Xóa user thành công !",
+      status: "success",
     });
   } catch (error) {
     return next(appError(error.message, 500));
@@ -215,7 +228,7 @@ const updateShippingAddressCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
-    res.json({
+    res.status(201).json({
       user,
       message: "Cập nhật địa chỉ nhận hàng thành công !",
       status: "success",
@@ -241,6 +254,7 @@ const uploadPhotoProfileCtrl = async (req, res, next) => {
 
     // check if user is updating their photo
     if (req.file) {
+      console.log(req.profile);
       // update profile photo
       await User.findByIdAndUpdate(
         req.userAuth,
@@ -251,9 +265,10 @@ const uploadPhotoProfileCtrl = async (req, res, next) => {
         },
         {
           new: true,
+          runValidators: true,
         }
       );
-      await res.json({
+      res.status(201).json({
         status: "success",
         data: "Cập nhật avatar thành công !",
       });
@@ -285,15 +300,20 @@ const updatePasswordUserCtrl = async (req, res, next) => {
           runValidators: true,
         }
       );
-      await res.json({
+      res.status(201).json({
         status: "success",
-        data: "user password is updated",
+        data: "Mật khẩu đã được cập nhật thành công !",
       });
     } else {
-      return next(appError("Mật khẩu không đúng, vui lòng kiểm tra lại"), 403);
+      return next(
+        appError(
+          "Mật khẩu và mật khẩu nhắc lại không khớp, vui lòng kiểm tra lại",
+          403
+        )
+      );
     }
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -304,11 +324,11 @@ const resetPasswordUserCtrl = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return next(appError("Email không tồn tại, vui lòng kiểm tra lại"), 403);
+      return next(appError("Email không tồn tại, vui lòng kiểm tra lại", 403));
     }
     // Gửi mail reset pass
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -317,10 +337,10 @@ const blockUserCtrl = async (req, res, next) => {
   try {
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
-      return next(appError("User không tồn tại"), 403);
+      return next(appError("User không tồn tại", 403));
     }
     if (userFound.isAdmin) {
-      return next(appError("Không thể khóa tài khoản admin"), 403);
+      return next(appError("Không thể khóa tài khoản admin", 403));
     }
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -338,7 +358,7 @@ const blockUserCtrl = async (req, res, next) => {
       message: "Khóa tài khoản user thành công",
     });
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -347,7 +367,7 @@ const unblockUserCtrl = async (req, res, next) => {
   try {
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
-      return next(appError("User không tồn tại"), 403);
+      return next(appError("User không tồn tại", 403));
     }
 
     const user = await User.findByIdAndUpdate(
@@ -366,7 +386,7 @@ const unblockUserCtrl = async (req, res, next) => {
       message: "Mở khóa tài khoản user thành công",
     });
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -374,7 +394,7 @@ const unblockUserCtrl = async (req, res, next) => {
 const adminDashboardCtrl = async (req, res, next) => {
   try {
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 

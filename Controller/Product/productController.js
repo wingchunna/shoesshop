@@ -16,6 +16,7 @@ const addProductCtrl = async (req, res, next) => {
       category,
       sizes,
       colors,
+      images,
       user,
       brand,
       price,
@@ -29,26 +30,27 @@ const addProductCtrl = async (req, res, next) => {
       colors &&
       price &&
       totalQuantity &&
-      brand
+      brand &&
+      images
     ) {
       // find Product
       const productFound = await Product.findOne({ name });
       if (productFound) {
-        return next(appError("Sản phẩm đã tồn tại"));
+        return next(appError("Sản phẩm đã tồn tại", 403));
       }
       // find Category
       const categoryFound = await Category.findOne({
         name: category,
       });
       if (!categoryFound) {
-        return next(appError("Không tìm thấy danh mục sản phẩm"));
+        return next(appError("Không tìm thấy danh mục sản phẩm", 403));
       }
       // find Brand
       const brandFound = await Brand.findOne({
         name: brand,
       });
       if (!brandFound) {
-        return next(appError("Không tìm thấy nhãn hàng"));
+        return next(appError("Không tìm thấy nhãn hàng", 403));
       }
       //find Color
 
@@ -63,6 +65,7 @@ const addProductCtrl = async (req, res, next) => {
         price,
         totalQuantity,
         user: req.userAuth,
+        images: images?.path,
       });
 
       // push product  to brand
@@ -75,16 +78,16 @@ const addProductCtrl = async (req, res, next) => {
       await categoryFound.save();
 
       // send response
-      res.json({
+      res.status(201).json({
+        product,
         status: "success",
         message: "Thêm mới sản phẩm thành công !",
-        product,
       });
     } else {
-      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm"));
+      return next(appError("Bạn cần nhập đầy đủ thông tin sản phẩm", 403));
     }
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -159,17 +162,17 @@ const getAllProductCtrl = async (req, res, next) => {
       .populate("category");
 
     if (products) {
-      res.json({
-        status: "success",
-        total,
+      res.status(201).json({
+        products: products,
         result: products?.length,
         pagination,
+        total,
         message: "Tìm kiếm sản phẩm thành công !",
-        products: products,
+        status: "success",
       });
     }
   } catch (error) {
-    next(appError(error.message));
+    next(appError(error.message, 500));
   }
 };
 
@@ -181,15 +184,15 @@ const getProductByIdCtrl = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      next(appError("Không tìm thấy sản phẩm !"));
+      next(appError("Không tìm thấy sản phẩm !", 403));
     }
-    res.json({
+    res.status(201).json({
       product,
       status: "success",
       message: "Tìm kiếm sản phẩm thành công !",
     });
   } catch (error) {
-    next(appError("Không tìm thấy sản phẩm !"));
+    next(appError("Không tìm thấy sản phẩm !", 500));
   }
 };
 
@@ -209,7 +212,9 @@ const updateProductCtrl = async (req, res, next) => {
       brand,
       price,
       totalQuality,
+      images,
     } = req.body;
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       {
@@ -222,6 +227,7 @@ const updateProductCtrl = async (req, res, next) => {
         brand,
         price,
         totalQuality,
+        images: images?.path,
       },
       {
         new: true,
@@ -233,7 +239,7 @@ const updateProductCtrl = async (req, res, next) => {
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -245,14 +251,14 @@ const deleteProductCtrl = async (req, res, next) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
-      return next(appError("Sản phẩm không tồn tại"), 403);
+      return next(appError("Sản phẩm không tồn tại", 403));
     }
-    res.json({
+    res.status(201).json({
       message: "Xóa sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message), 500);
+    return next(appError(error.message, 500));
   }
 };
 
@@ -260,41 +266,42 @@ const deleteProductCtrl = async (req, res, next) => {
 //@route PUT /api/v1/Products/:id
 //@access Private/Admin
 
-//upload Photo
-const uploadPhotoProductCtrl = async (req, res, next) => {
-  try {
-    //find the product to be update
-    const product = await Product.findById(req.params.id);
-    // check if user is found
-    if (!product) {
-      return next(appError("Sản phẩm không tồn tại !", 403));
-    }
+// //upload Photo
+// const uploadPhotoProductCtrl = async (req, res, next) => {
+//   try {
+//     //find the product to be update
+//     const product = await Product.findById(req.params.id);
+//     // check if product is found
+//     if (!product) {
+//       return next(appError("Sản phẩm không tồn tại !", 403));
+//     }
 
-    // check if product is updating their photo
-    if (req.files) {
-      // update profile photo
-      await Product.findByIdAndUpdate(
-        req.params.id,
-        {
-          $set: {
-            images: req.files.path,
-          },
-        },
-        {
-          new: true,
-        }
-      );
-      await res.json({
-        status: "success",
-        data: "Cập nhật avatar thành công !",
-      });
-    } else {
-      next(appError("file không tồn tại", 403));
-    }
-  } catch (error) {
-    next(appError(error.message, 500));
-  }
-};
+//     // check if product is updating their photo
+//     if (req.files) {
+//       // update profile photo
+//       await Product.findByIdAndUpdate(
+//         req.params.id,
+//         {
+//           $set: {
+//             images: req.files?.path,
+//           },
+//         },
+//         {
+//           new: true,
+//           runValidators: true,
+//         }
+//       );
+//       await res.status(201).json({
+//         status: "success",
+//         message: "Cập nhật avatar thành công !",
+//       });
+//     } else {
+//       return next(appError("file không tồn tại", 403));
+//     }
+//   } catch (error) {
+//     next(appError(error.message, 500));
+//   }
+// };
 
 module.exports = {
   addProductCtrl,
@@ -302,5 +309,4 @@ module.exports = {
   getProductByIdCtrl,
   updateProductCtrl,
   deleteProductCtrl,
-  uploadPhotoProductCtrl,
 };

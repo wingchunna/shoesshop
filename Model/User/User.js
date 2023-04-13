@@ -23,6 +23,7 @@ const userSchema = new Schema(
     profilePhoto: {
       type: String,
       required: [true, "Profile is required"],
+      default: "https://via.placeholder.com/150",
     },
     orders: [
       {

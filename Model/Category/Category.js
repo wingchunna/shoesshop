@@ -13,7 +13,7 @@ const CategorySchema = new Schema(
       ref: "User",
       require: true,
     },
-    images: {
+    image: {
       type: String,
       require: true,
       default: "https://picsum.photos/200/300",

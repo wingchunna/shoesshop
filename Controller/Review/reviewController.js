@@ -12,13 +12,13 @@ const addReviewCtrl = async (req, res, next) => {
     //check Id format
     const productId = req.params.productId;
     if (productId.length !== 24) {
-      return next(appError("Mã Id sản phẩm không đúng"));
+      return next(appError("Mã Id sản phẩm không đúng", 403));
     }
 
     //find product with ID
     const product = await Product.findById(productId).populate("reviews");
     if (!product) {
-      return next(appError("Không tìm thấy sản phẩm"));
+      return next(appError("Không tìm thấy sản phẩm", 403));
     }
     // check user reviewed
 
@@ -27,7 +27,7 @@ const addReviewCtrl = async (req, res, next) => {
     });
 
     if (isReviewed) {
-      return next(appError("Bạn đã đánh giá sản phẩm này"));
+      return next(appError("Bạn đã đánh giá sản phẩm này", 403));
     }
     // create review
     const review = await Review.create({
@@ -46,7 +46,7 @@ const addReviewCtrl = async (req, res, next) => {
       message: "Bạn đã đánh giá sản phẩm thành công",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -58,13 +58,13 @@ const getAllReviewCtrl = async (req, res, next) => {
   try {
     const Reviews = await Review.find();
 
-    res.json({
+    res.status(201).json({
       Reviews,
       status: "success",
       message: "Tìm kiếm màu sắc sản phẩm thành công !",
     });
   } catch (error) {
-    next(appError(error.message));
+    next(appError(error.message, 500));
   }
 };
 
@@ -76,15 +76,15 @@ const getReviewByIdCtrl = async (req, res, next) => {
   try {
     const Review = await Review.findById(req.params.id);
     if (!Review) {
-      next(appError("Không tìm thấy màu sắc sản phẩm !"));
+      next(appError("Không tìm thấy màu sắc sản phẩm !", 403));
     }
-    res.json({
+    res.status(201).json({
       Review,
       status: "success",
       message: "Tìm kiếm màu sắc sản phẩm thành công !",
     });
   } catch (error) {
-    next(appError("Không tìm thấy màu sắc sản phẩm !"));
+    next(appError("Không tìm thấy màu sắc sản phẩm !", 500));
   }
 };
 
@@ -105,12 +105,12 @@ const updateReviewCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
-    res.json({
+    res.status(201).json({
       message: "Cập nhật màu sắc sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
@@ -121,12 +121,12 @@ const updateReviewCtrl = async (req, res, next) => {
 const deleteReviewCtrl = async (req, res, next) => {
   try {
     const Review = await Review.findByIdAndDelete(req.params.id);
-    res.json({
+    res.status(201).json({
       message: "Xóa màu sắc sản phẩm thành công !",
       status: "success",
     });
   } catch (error) {
-    return next(appError(error.message));
+    return next(appError(error.message, 500));
   }
 };
 
