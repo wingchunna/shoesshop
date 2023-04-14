@@ -17,6 +17,7 @@ const {
   unblockUserCtrl,
   adminDashboardCtrl,
   reqResetPasswordCtrl,
+  userLogoutCtrl,
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -29,6 +30,9 @@ userRoutes.post("/register", userRegisterCtrl);
 
 //POST/users/login
 userRoutes.post("/login", userLoginCtrl);
+
+//GET/users/logout
+userRoutes.get("/logout", isLogin, userLogoutCtrl);
 
 //GET/users/ get all user
 userRoutes.get("/", isLogin, getAllUserCtrl);

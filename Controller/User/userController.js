@@ -42,7 +42,6 @@ const userRegisterCtrl = async (req, res, next) => {
 const userLoginCtrl = async (req, res, next) => {
   const { email, password } = req.body;
   if (email && password) {
-    console.log("loggin");
     try {
       //find the user in db
       const userFound = await User.findOne({ email });
@@ -84,6 +83,28 @@ const userLoginCtrl = async (req, res, next) => {
     } catch (error) {
       return next(appError(error.message, 500));
     }
+  }
+};
+
+//@desc Logout User
+//@route POST /api/v1/users/login
+//@access Private/Admin
+
+const userLogoutCtrl = async (req, res, next) => {
+  try {
+    if (req.session) {
+      res.clearCookie("connect.sid", {
+        path: "/",
+      });
+      req.session.destroy(function (err) {
+        res.json({
+          message: "Đăng xuất thành công !",
+          status: "success",
+        });
+      });
+    }
+  } catch (error) {
+    return next(appError(error.message, 500));
   }
 };
 
@@ -462,4 +483,5 @@ module.exports = {
   unblockUserCtrl,
   adminDashboardCtrl,
   reqResetPasswordCtrl,
+  userLogoutCtrl,
 };

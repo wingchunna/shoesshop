@@ -2,6 +2,9 @@ const express = require("express");
 const { appError, notFound } = require("../Middlewares/appError");
 const app = express();
 
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+
 require("dotenv").config();
 require("../Config/dbConnect");
 const userRoutes = require("../Routes/users/userRoute");
@@ -13,6 +16,16 @@ const reviewRoutes = require("../Routes/reviews/reviewRoute");
 const orderRoutes = require("../Routes/orders/orderRoute");
 const couponRoutes = require("../Routes/coupons/couponRoute");
 app.use(express.json());
+app.use(cookieParser());
+app.set("trust proxy", 1);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
 
 //Routes
 //User Routes

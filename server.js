@@ -1,5 +1,5 @@
 const https = require("https");
-const app = require("./app/app");
+const app = require("./App/app");
 const fs = require("fs");
 
 require("dotenv").config();
