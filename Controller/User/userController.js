@@ -1,4 +1,4 @@
-const User = require("../../model/User/User");
+const User = require("../../Model/User/User");
 const { hashPassword, comparePassword } = require("../../Utils/hashPassword");
 const { appError, notFound } = require("../../Middlewares/appError");
 const generateToken = require("../../Utils/generateToken");

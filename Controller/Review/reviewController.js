@@ -1,5 +1,5 @@
-const Review = require("../../model/Review/Review");
-const Product = require("../../model/Product/Product");
+const Review = require("../../Model/Review/Review");
+const Product = require("../../Model/Product/Product");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Review

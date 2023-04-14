@@ -1,4 +1,4 @@
-const Category = require("../../model/Category/Category");
+const Category = require("../../Model/Category/Category");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Category

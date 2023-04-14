@@ -1,4 +1,4 @@
-const Coupon = require("../../model/Coupon/Coupon");
+const Coupon = require("../../Model/Coupon/Coupon");
 const { appError, notFound } = require("../../Middlewares/appError");
 const moment = require("moment");
 //@desc Register Coupon

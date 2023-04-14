@@ -1,4 +1,4 @@
-const Brand = require("../../model/Brand/Brand");
+const Brand = require("../../Model/Brand/Brand");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Brand

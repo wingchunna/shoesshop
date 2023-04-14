@@ -1,4 +1,4 @@
-const Color = require("../../model/Color/Color");
+const Color = require("../../Model/Color/Color");
 const { appError, notFound } = require("../../Middlewares/appError");
 
 //@desc Register Color

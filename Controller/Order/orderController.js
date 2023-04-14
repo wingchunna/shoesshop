@@ -1,8 +1,8 @@
-const Order = require("../../model/Order/Order");
+const Order = require("../../Model/Order/Order");
 const { appError, notFound } = require("../../Middlewares/appError");
-const User = require("../../model/User/User");
-const Product = require("../../model/Product/Product");
-const Coupon = require("../../model/Coupon/Coupon");
+const User = require("../../Model/User/User");
+const Product = require("../../Model/Product/Product");
+const Coupon = require("../../Model/Coupon/Coupon");
 const sortObject = require("../../Utils/sortObject");
 const moment = require("moment");
 const crypto = require("crypto");
