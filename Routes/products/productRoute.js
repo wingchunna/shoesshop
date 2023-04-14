@@ -5,7 +5,7 @@ const {
   getProductByIdCtrl,
   updateProductCtrl,
   deleteProductCtrl,
-} = require("../../Controller/Product/ProductController");
+} = require("../../Controller/Product/productController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
 const productRoutes = express.Router();

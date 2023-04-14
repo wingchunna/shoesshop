@@ -5,7 +5,7 @@ const {
   getReviewByIdCtrl,
   updateReviewCtrl,
   deleteReviewCtrl,
-} = require("../../Controller/Review/ReviewController");
+} = require("../../Controller/Review/reviewController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
 const reviewRoutes = express.Router();

@@ -5,7 +5,7 @@ const {
   getBrandByIdCtrl,
   updateBrandCtrl,
   deleteBrandCtrl,
-} = require("../../Controller/Brand/BrandController");
+} = require("../../Controller/Brand/brandController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
 const storage = require("../../Config/upload-brand-images");

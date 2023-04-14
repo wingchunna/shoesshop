@@ -11,7 +11,7 @@ const {
   getVNPayIpnCtrl,
   getVNPayReturnCtrl,
   getOrderStatsCtrl,
-} = require("../../Controller/Order/OrderController");
+} = require("../../Controller/Order/orderController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
 const orderRoutes = express.Router();
