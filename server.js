@@ -6,10 +6,10 @@ require("dotenv").config();
 const PORT = process.env.PORT;
 const HOST = process.env.HOST;
 const server = https.createServer(
-  {
-    key: fs.readFileSync("key.pem"),
-    cert: fs.readFileSync("cert.pem"),
-  },
+  // {
+  //   key: fs.readFileSync("key.pem"),
+  //   cert: fs.readFileSync("cert.pem"),
+  // },
   app
 );
 
