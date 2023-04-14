@@ -18,6 +18,7 @@ const couponRoutes = require("../Routes/coupons/couponRoute");
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
+// config session
 app.use(
   session({
     secret: process.env.SESSION_SECRET_KEY,
