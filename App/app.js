@@ -2,7 +2,7 @@ const express = require("express");
 const { appError, notFound } = require("../Middlewares/appError");
 const app = express();
 
-const session = require("express-session");
+const session = require("cookie-session");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -22,8 +22,9 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET_KEY,
     resave: false,
+    // store: new RedisStore(),
     saveUninitialized: true,
-    cookie: { secure: true },
+    cookie: { secure: true, maxAge: 60000 },
   })
 );
 
