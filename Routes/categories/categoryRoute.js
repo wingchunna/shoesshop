@@ -8,7 +8,7 @@ const {
 } = require("../../Controller/Category/categoryController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
-const storage = require("../../config/upload-category-images");
+const storage = require("../../Config/upload-category-images");
 const multer = require("multer");
 const upload = multer({ storage });
 const categoryRoutes = express.Router();

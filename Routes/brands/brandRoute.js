@@ -8,7 +8,7 @@ const {
 } = require("../../Controller/Brand/BrandController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
-const storage = require("../../config/upload-brand-images");
+const storage = require("../../Config/upload-brand-images");
 const multer = require("multer");
 const upload = multer({ storage });
 const brandRoutes = express.Router();

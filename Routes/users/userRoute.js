@@ -21,7 +21,7 @@ const {
 } = require("../../Controller/User/userController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
-const storage = require("../../config/upload-profile-images");
+const storage = require("../../Config/upload-profile-images");
 const multer = require("multer");
 const upload = multer({ storage });
 
