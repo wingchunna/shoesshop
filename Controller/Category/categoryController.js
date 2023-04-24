@@ -8,11 +8,11 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addCategoryCtrl = async (req, res, next) => {
   //check Category exits
   const { name, user, product } = req.body;
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
-   
+
     if (name) {
       const categoryFound = await Category.findOne({ name });
       if (categoryFound) {
@@ -47,7 +47,7 @@ const addCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getAllCategoryCtrl = async (req, res, next) => {
-  try { 
+  try {
     const categories = await Category.find();
     if (!categories) {
       return next(appError("Không tìm thấy danh sách danh mục", 403));
@@ -67,7 +67,7 @@ const getAllCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getCategoryByIdCtrl = async (req, res, next) => {
-  try { 
+  try {
     const category = await Category.findById(req.params.id);
     if (!category) {
       next(appError("Không tìm thấy danh mục !", 403));
@@ -87,7 +87,7 @@ const getCategoryByIdCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const updateCategoryCtrl = async (req, res, next) => {
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
@@ -120,7 +120,7 @@ const updateCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const deleteCategoryCtrl = async (req, res, next) => {
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
@@ -140,8 +140,8 @@ const deleteCategoryCtrl = async (req, res, next) => {
 
 // const uploadPhotoCategoryCtrl = async (req, res, next) => {
 //   try { if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+//   return next(appError("Bạn cần đăng nhập", 403));
+// }
 //     const category = await Category.findById(req.params.id);
 //     // check if product is found
 //     if (!category) {
