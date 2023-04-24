@@ -9,7 +9,7 @@ const { appError, notFound } = require("../../Middlewares/appError");
 
 const addProductCtrl = async (req, res, next) => {
   //check Product exits
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
@@ -108,8 +108,7 @@ const addProductCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getAllProductCtrl = async (req, res, next) => {
-  try { 
-    
+  try {
     let productQuery = Product.find();
 
     if (req.query.name) {
@@ -194,8 +193,7 @@ const getAllProductCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getProductByIdCtrl = async (req, res, next) => {
-  try { 
-    
+  try {
     const product = await Product.findById(req.params.id);
     if (!product) {
       next(appError("Không tìm thấy sản phẩm !", 403));
@@ -215,7 +213,7 @@ const getProductByIdCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const updateProductCtrl = async (req, res, next) => {
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
@@ -270,7 +268,7 @@ const updateProductCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const deleteProductCtrl = async (req, res, next) => {
-  try { 
+  try {
     if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
@@ -294,8 +292,8 @@ const deleteProductCtrl = async (req, res, next) => {
 // //upload Photo
 // const uploadPhotoProductCtrl = async (req, res, next) => {
 //   try { if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+//   return next(appError("Bạn cần đăng nhập", 403));
+// }
 //     //find the product to be update
 //     const product = await Product.findById(req.params.id);
 //     // check if product is found
