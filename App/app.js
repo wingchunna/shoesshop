@@ -38,7 +38,7 @@ app.use(
 app.use(function (req, res, next) {
   req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8888");
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
   // Request methods you wish to allow
   res.setHeader(
