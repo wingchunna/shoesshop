@@ -109,9 +109,7 @@ const addProductCtrl = async (req, res, next) => {
 
 const getAllProductCtrl = async (req, res, next) => {
   try { 
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+    
     let productQuery = Product.find();
 
     if (req.query.name) {
@@ -197,9 +195,7 @@ const getAllProductCtrl = async (req, res, next) => {
 
 const getProductByIdCtrl = async (req, res, next) => {
   try { 
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+    
     const product = await Product.findById(req.params.id);
     if (!product) {
       next(appError("Không tìm thấy sản phẩm !", 403));

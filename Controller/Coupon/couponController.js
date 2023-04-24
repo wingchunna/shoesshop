@@ -106,9 +106,6 @@ const getDateNow = () => {
 
 const getAllCouponCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const coupons = await Coupon.find();
     if (!coupons) {
       return next(appError("Không tìm thấy danh sách Coupon", 403));
@@ -129,9 +126,6 @@ const getAllCouponCtrl = async (req, res, next) => {
 
 const getCouponByIdCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) {
       next(appError("Không tìm thấy Coupon !", 403));

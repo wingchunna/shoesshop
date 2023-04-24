@@ -143,9 +143,6 @@ const addOrderCtrl = async (req, res, next) => {
 
 const getAllOrderCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const orders = await Order.find();
     if (orders) {
       res.status(201).json({
@@ -167,9 +164,6 @@ const getAllOrderCtrl = async (req, res, next) => {
 
 const getOrderByIdCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const order = await Order.findById(req.params.id);
     if (!order) {
       next(appError("Không tìm thấy đơn hàng !", 403));

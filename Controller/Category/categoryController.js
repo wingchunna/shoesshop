@@ -7,10 +7,12 @@ const { appError, notFound } = require("../../Middlewares/appError");
 
 const addCategoryCtrl = async (req, res, next) => {
   //check Category exits
-  try { if (!req.session.authorized) {
+  const { name, user, product } = req.body;
+  try { 
+    if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
-    const { name, user, product } = req.body;
+   
     if (name) {
       const categoryFound = await Category.findOne({ name });
       if (categoryFound) {
@@ -45,9 +47,7 @@ const addCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getAllCategoryCtrl = async (req, res, next) => {
-  try { if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+  try { 
     const categories = await Category.find();
     if (!categories) {
       return next(appError("Không tìm thấy danh sách danh mục", 403));
@@ -67,9 +67,7 @@ const getAllCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getCategoryByIdCtrl = async (req, res, next) => {
-  try { if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
+  try { 
     const category = await Category.findById(req.params.id);
     if (!category) {
       next(appError("Không tìm thấy danh mục !", 403));
@@ -89,7 +87,8 @@ const getCategoryByIdCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const updateCategoryCtrl = async (req, res, next) => {
-  try { if (!req.session.authorized) {
+  try { 
+    if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
     const { name } = req.body;
@@ -121,7 +120,8 @@ const updateCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const deleteCategoryCtrl = async (req, res, next) => {
-  try { if (!req.session.authorized) {
+  try { 
+    if (!req.session.authorized) {
       return next(appError("Bạn cần đăng nhập", 403));
     }
     const category = await Category.findByIdAndDelete(req.params.id);

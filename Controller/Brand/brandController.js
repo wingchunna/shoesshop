@@ -48,9 +48,6 @@ const addBrandCtrl = async (req, res, next) => {
 
 const getAllBrandCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const brands = await Brand.find();
     if (!brands) {
       return next(appError("Không tìm thấy danh sách nhãn hàng", 403));
@@ -72,9 +69,6 @@ const getAllBrandCtrl = async (req, res, next) => {
 
 const getBrandByIdCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
-    }
     const brand = await Brand.findById(req.params.id);
     if (!brand) {
       next(appError("Không tìm thấy nhãn hàng !", 403));
