@@ -9,7 +9,7 @@ const addColorCtrl = async (req, res, next) => {
   //check Color exits
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name } = req.body;
     console.log(name);
@@ -86,7 +86,7 @@ const getColorByIdCtrl = async (req, res, next) => {
 const updateColorCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name } = req.body;
     const color = await Color.findByIdAndUpdate(
@@ -115,7 +115,7 @@ const updateColorCtrl = async (req, res, next) => {
 const deleteColorCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const color = await color.findByIdAndDelete(req.params.id);
     res.status(201).json({

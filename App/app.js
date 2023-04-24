@@ -26,7 +26,7 @@ app.use(
       sameSite: "strict",
       secure: false,
       saveUninitialized: true,
-      maxAge: 60000,
+      maxAge: 1000 * 60 * 60 * 24 * 7 * 4 * 6,
       resave: false,
     },
 

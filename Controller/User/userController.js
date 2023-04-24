@@ -129,7 +129,7 @@ const getUserProfileCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     next(appError("Không thể xem user profile", 500));
@@ -154,7 +154,7 @@ const getAllUserCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     next(appError(error.message, 500));
@@ -178,7 +178,7 @@ const getUserByIdCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     return next(appError(error.message, 500));
@@ -209,7 +209,7 @@ const updateUserCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     return next(appError(error.message, 500));
@@ -230,7 +230,7 @@ const deleteUserCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     return next(appError(error.message, 500));
@@ -281,7 +281,7 @@ const updateShippingAddressCtrl = async (req, res, next) => {
         status: "success",
       });
     } else {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     return next(appError(error.message, 500));
@@ -296,7 +296,7 @@ const updateShippingAddressCtrl = async (req, res, next) => {
 const uploadPhotoProfileCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     //find the user to be update
     const user = await User.findById(req.userAuth);
@@ -338,7 +338,7 @@ const updatePasswordUserCtrl = async (req, res, next) => {
   const { password, retypePassword } = req.body;
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
 
     // check if user is updating the password
@@ -378,7 +378,7 @@ const resetPasswordUserCtrl = async (req, res, next) => {
   const { email, password, retypePassword } = req.body;
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     if (email && password && retypePassword) {
       if (password !== retypePassword) {
@@ -418,7 +418,7 @@ const reqResetPasswordCtrl = async (req, res, next) => {
   // check email in DB
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const user = await User.findOne({ email });
     if (!user) {
@@ -445,7 +445,7 @@ const reqResetPasswordCtrl = async (req, res, next) => {
 const blockUserCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
@@ -478,7 +478,7 @@ const blockUserCtrl = async (req, res, next) => {
 const unblockUserCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
@@ -509,7 +509,7 @@ const unblockUserCtrl = async (req, res, next) => {
 const adminDashboardCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
   } catch (error) {
     return next(appError(error.message, 500));

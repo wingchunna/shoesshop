@@ -9,7 +9,7 @@ const addCouponCtrl = async (req, res, next) => {
   //check Coupon exits
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     let { code, startDate, endDate, discount } = req.body;
     if (code && discount && startDate && endDate) {
@@ -147,7 +147,7 @@ const getCouponByIdCtrl = async (req, res, next) => {
 const updateCouponCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     let { code, discount, endDate, startDate } = req.body;
     if (code && discount && startDate && endDate) {
@@ -211,7 +211,7 @@ const updateCouponCtrl = async (req, res, next) => {
 const deleteCouponCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const coupon = await Coupon.findByIdAndDelete(req.params.id);
     res.status(201).json({

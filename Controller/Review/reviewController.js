@@ -10,7 +10,7 @@ const addReviewCtrl = async (req, res, next) => {
   const { message, rating } = req.body;
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
 
     //check Id format
@@ -99,7 +99,7 @@ const getReviewByIdCtrl = async (req, res, next) => {
 const updateReviewCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name } = req.body;
     const Review = await Review.findByIdAndUpdate(
@@ -128,7 +128,7 @@ const updateReviewCtrl = async (req, res, next) => {
 const deleteReviewCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const Review = await Review.findByIdAndDelete(req.params.id);
     res.status(201).json({

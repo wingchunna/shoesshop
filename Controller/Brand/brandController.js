@@ -9,7 +9,7 @@ const addBrandCtrl = async (req, res, next) => {
   //check Brand exits
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name, user, product, image } = req.body;
     if (name) {
@@ -90,7 +90,7 @@ const getBrandByIdCtrl = async (req, res, next) => {
 const updateBrandCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name } = req.body;
     if (!req.file) {
@@ -124,7 +124,7 @@ const updateBrandCtrl = async (req, res, next) => {
 const deleteBrandCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const brand = await Brand.findByIdAndDelete(req.params.id);
     res.status(201).json({

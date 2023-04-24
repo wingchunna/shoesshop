@@ -10,7 +10,7 @@ const addCategoryCtrl = async (req, res, next) => {
   const { name, user, product } = req.body;
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
 
     if (name) {
@@ -89,7 +89,7 @@ const getCategoryByIdCtrl = async (req, res, next) => {
 const updateCategoryCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const { name } = req.body;
     if (!req.file) {
@@ -122,7 +122,7 @@ const updateCategoryCtrl = async (req, res, next) => {
 const deleteCategoryCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const category = await Category.findByIdAndDelete(req.params.id);
     res.status(201).json({
@@ -140,7 +140,7 @@ const deleteCategoryCtrl = async (req, res, next) => {
 
 // const uploadPhotoCategoryCtrl = async (req, res, next) => {
 //   try { if (!req.session.authorized) {
-//   return next(appError("Bạn cần đăng nhập", 403));
+//   return next(appError("Bạn cần đăng nhập", 401));
 // }
 //     const category = await Category.findById(req.params.id);
 //     // check if product is found

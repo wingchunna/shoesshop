@@ -11,7 +11,7 @@ const addProductCtrl = async (req, res, next) => {
   //check Product exits
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const {
       name,
@@ -215,7 +215,7 @@ const getProductByIdCtrl = async (req, res, next) => {
 const updateProductCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const {
       name,
@@ -270,7 +270,7 @@ const updateProductCtrl = async (req, res, next) => {
 const deleteProductCtrl = async (req, res, next) => {
   try {
     if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 403));
+      return next(appError("Bạn cần đăng nhập", 401));
     }
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
@@ -292,7 +292,7 @@ const deleteProductCtrl = async (req, res, next) => {
 // //upload Photo
 // const uploadPhotoProductCtrl = async (req, res, next) => {
 //   try { if (!req.session.authorized) {
-//   return next(appError("Bạn cần đăng nhập", 403));
+//   return next(appError("Bạn cần đăng nhập", 401));
 // }
 //     //find the product to be update
 //     const product = await Product.findById(req.params.id);
