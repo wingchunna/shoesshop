@@ -23,12 +23,13 @@ app.use(
     name: "cookye",
     secret: process.env.SESSION_SECRET_KEY,
     cookie: {
-      sameSite :"strict",
+      sameSite: "strict",
       secure: false,
       saveUninitialized: true,
-      maxAge : 60000
-    }
-    resave: false,
+      maxAge: 60000,
+      resave: false,
+    },
+
     // store: new RedisStore(),
   })
 );
