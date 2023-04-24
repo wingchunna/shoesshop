@@ -1,6 +1,7 @@
 const express = require("express");
 const { appError, notFound } = require("../Middlewares/appError");
 const app = express();
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
@@ -15,6 +16,7 @@ const reviewRoutes = require("../Routes/reviews/reviewRoute");
 const orderRoutes = require("../Routes/orders/orderRoute");
 const couponRoutes = require("../Routes/coupons/couponRoute");
 app.use(express.json());
+
 app.use(cookieParser());
 app.set("trust proxy", 1);
 // config session
@@ -37,6 +39,16 @@ app.use(function (req, res, next) {
   req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
   next();
 });
+
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
 //Routes
 //User Routes
 
