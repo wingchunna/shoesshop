@@ -8,6 +8,9 @@ const moment = require("moment");
 const addCouponCtrl = async (req, res, next) => {
   //check Coupon exits
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let { code, startDate, endDate, discount } = req.body;
     if (code && discount && startDate && endDate) {
       const couponFound = await Coupon.findOne({ code });
@@ -103,6 +106,9 @@ const getDateNow = () => {
 
 const getAllCouponCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const coupons = await Coupon.find();
     if (!coupons) {
       return next(appError("Không tìm thấy danh sách Coupon", 403));
@@ -123,6 +129,9 @@ const getAllCouponCtrl = async (req, res, next) => {
 
 const getCouponByIdCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) {
       next(appError("Không tìm thấy Coupon !", 403));
@@ -143,11 +152,14 @@ const getCouponByIdCtrl = async (req, res, next) => {
 
 const updateCouponCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let { code, discount, endDate, startDate } = req.body;
     if (code && discount && startDate && endDate) {
       const couponFound = await Coupon.findOne({ code });
-      if (couponFound) {
-        return next(appError("Coupon đã tồn tại", 403));
+      if (!couponFound) {
+        return next(appError("Coupon không tồn tại", 403));
       }
       if (isNaN(discount)) {
         return next(appError("Discount phải là số", 403));
@@ -204,6 +216,9 @@ const updateCouponCtrl = async (req, res, next) => {
 
 const deleteCouponCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const coupon = await Coupon.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa danh mục sản phẩm thành công !",

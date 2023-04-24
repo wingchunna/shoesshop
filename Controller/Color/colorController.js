@@ -8,6 +8,9 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addColorCtrl = async (req, res, next) => {
   //check Color exits
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name } = req.body;
     console.log(name);
     if (name) {
@@ -41,6 +44,9 @@ const addColorCtrl = async (req, res, next) => {
 
 const getAllColorCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const colors = await Color.find();
     if (!colors) {
       next(appError("Không tìm thấy danh sách màu sắc", 403));
@@ -62,6 +68,9 @@ const getAllColorCtrl = async (req, res, next) => {
 
 const getColorByIdCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const color = await Color.findById(req.params.id);
     if (!color) {
       next(appError("Không tìm thấy màu sắc sản phẩm !", 403));
@@ -82,6 +91,9 @@ const getColorByIdCtrl = async (req, res, next) => {
 
 const updateColorCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name } = req.body;
     const color = await Color.findByIdAndUpdate(
       req.params.id,
@@ -108,6 +120,9 @@ const updateColorCtrl = async (req, res, next) => {
 
 const deleteColorCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const color = await color.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa màu sắc sản phẩm thành công !",

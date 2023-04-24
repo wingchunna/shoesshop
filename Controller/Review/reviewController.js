@@ -9,6 +9,10 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addReviewCtrl = async (req, res, next) => {
   const { message, rating } = req.body;
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
+
     //check Id format
     const productId = req.params.productId;
     if (productId.length !== 24) {
@@ -56,6 +60,10 @@ const addReviewCtrl = async (req, res, next) => {
 
 const getAllReviewCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
+
     const Reviews = await Review.find();
 
     res.status(201).json({
@@ -74,6 +82,10 @@ const getAllReviewCtrl = async (req, res, next) => {
 
 const getReviewByIdCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
+
     const Review = await Review.findById(req.params.id);
     if (!Review) {
       next(appError("Không tìm thấy màu sắc sản phẩm !", 403));
@@ -94,6 +106,9 @@ const getReviewByIdCtrl = async (req, res, next) => {
 
 const updateReviewCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name } = req.body;
     const Review = await Review.findByIdAndUpdate(
       req.params.id,
@@ -120,6 +135,9 @@ const updateReviewCtrl = async (req, res, next) => {
 
 const deleteReviewCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const Review = await Review.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa màu sắc sản phẩm thành công !",

@@ -21,6 +21,9 @@ require("dotenv").config();
 
 const addOrderCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     //check payload
     const { orderItems, shippingAddress, totalPrice } = req.body;
     const { coupon } = req?.query;
@@ -140,6 +143,9 @@ const addOrderCtrl = async (req, res, next) => {
 
 const getAllOrderCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const orders = await Order.find();
     if (orders) {
       res.status(201).json({
@@ -161,6 +167,9 @@ const getAllOrderCtrl = async (req, res, next) => {
 
 const getOrderByIdCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const order = await Order.findById(req.params.id);
     if (!order) {
       next(appError("Không tìm thấy đơn hàng !", 403));
@@ -183,6 +192,9 @@ const getOrderByIdCtrl = async (req, res, next) => {
 const updateOrderCtrl = async (req, res, next) => {
   const status = req.body.status;
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       {
@@ -209,6 +221,9 @@ const updateOrderCtrl = async (req, res, next) => {
 
 const deleteOrderCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const order = await Order.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa đơn hàng thành công !",
@@ -224,6 +239,9 @@ const deleteOrderCtrl = async (req, res, next) => {
 //@access Private/Admin
 const createPaymentUrlCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let myOrderId = req.body.myOrderId;
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
@@ -303,6 +321,9 @@ const createPaymentUrlCtrl = async (req, res, next) => {
 //@access Private/Admin
 const querydrCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     process.env.TZ = "Asia/Ho_Chi_Minh";
 
     let vnp_TmnCode = process.env.VNP_TMNCODE;
@@ -390,6 +411,9 @@ const querydrCtrl = async (req, res, next) => {
 //@access Private/Admin
 const refundCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let secretKey = process.env.VNP_HASHSECRET;
 
     let vnp_TmnCode = process.env.VNP_TMNCODE;
@@ -488,6 +512,9 @@ const refundCtrl = async (req, res, next) => {
 //@access Private/Admin
 const getVNPayIpnCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let vnp_params = req.query;
     let secureHash = vnp_params["vnp_SecureHash"];
 
@@ -588,6 +615,9 @@ const getVNPayIpnCtrl = async (req, res, next) => {
 //@access Private/Admin
 const getVNPayReturnCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     let vnp_params = req.query;
     let secureHash = vnp_params["vnp_SecureHash"];
 
@@ -625,6 +655,9 @@ const getVNPayReturnCtrl = async (req, res, next) => {
 //@access Private/Admin
 const getOrderStatsCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const sumOfTotalSales = await Order.aggregate([
       { $match: { active: true } },
       {

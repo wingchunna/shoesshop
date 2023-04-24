@@ -74,9 +74,12 @@ const userLoginCtrl = async (req, res, next) => {
           )
         );
       }
+      const userToken = generateToken(userFound?._id);
+      req.session.user = userToken;
+      req.session.authorized = true;
       res.status(201).json({
         user: userFound,
-        token: generateToken(userFound?._id),
+        token: userToken,
         message: "Đăng nhập thành công",
         status: "success",
       });
@@ -92,7 +95,7 @@ const userLoginCtrl = async (req, res, next) => {
 
 const userLogoutCtrl = async (req, res, next) => {
   try {
-    if (req.session) {
+    if (req.session.authorized) {
       res.clearCookie("connect.sid", {
         path: "/",
       });
@@ -114,16 +117,20 @@ const userLogoutCtrl = async (req, res, next) => {
 
 const getUserProfileCtrl = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userAuth).populate("orders");
+    if (req.session.authorized) {
+      const user = await User.findById(req.userAuth).populate("orders");
 
-    if (!user) {
-      return next(appError("Không tìm thấy user", 403));
+      if (!user) {
+        return next(appError("Không tìm thấy user", 403));
+      }
+      res.status(201).json({
+        user,
+        message: "Truy vấn profile thành công",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
     }
-    res.status(201).json({
-      user,
-      message: "Truy vấn profile thành công",
-      status: "success",
-    });
   } catch (error) {
     next(appError("Không thể xem user profile", 500));
   }
@@ -135,16 +142,20 @@ const getUserProfileCtrl = async (req, res, next) => {
 
 const getAllUserCtrl = async (req, res, next) => {
   try {
-    const users = await User.find();
+    if (req.session.authorized) {
+      const users = await User.find();
 
-    if (!users) {
-      return next(appError("Không tìm thấy user", 403));
+      if (!users) {
+        return next(appError("Không tìm thấy user", 403));
+      }
+      res.status(201).json({
+        users,
+        message: "Truy vấn danh sách users thành công",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
     }
-    res.status(201).json({
-      users,
-      message: "Truy vấn danh sách users thành công",
-      status: "success",
-    });
   } catch (error) {
     next(appError(error.message, 500));
   }
@@ -156,15 +167,19 @@ const getAllUserCtrl = async (req, res, next) => {
 
 const getUserByIdCtrl = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).populate("orders");
-    if (!user) {
-      return next(appError("Không tìm thấy user", 403));
+    if (req.session.authorized) {
+      const user = await User.findById(req.params.id).populate("orders");
+      if (!user) {
+        return next(appError("Không tìm thấy user", 403));
+      }
+      res.status(201).json({
+        user,
+        message: "Truy vấn user thành công",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
     }
-    res.status(201).json({
-      user,
-      message: "Truy vấn user thành công",
-      status: "success",
-    });
   } catch (error) {
     return next(appError(error.message, 500));
   }
@@ -176,22 +191,26 @@ const getUserByIdCtrl = async (req, res, next) => {
 
 const updateUserCtrl = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        fullname: req?.body?.fullname,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    if (req.session.authorized) {
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          fullname: req?.body?.fullname,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
-    res.status(201).json({
-      user,
-      message: "Cập nhật thông tin User thành công !",
-      status: "success",
-    });
+      res.status(201).json({
+        user,
+        message: "Cập nhật thông tin User thành công !",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
   } catch (error) {
     return next(appError(error.message, 500));
   }
@@ -203,12 +222,16 @@ const updateUserCtrl = async (req, res, next) => {
 
 const deleteUserCtrl = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.userAuth);
+    if (req.session.authorized) {
+      const user = await User.findByIdAndDelete(req.userAuth);
 
-    res.status(201).json({
-      message: "Xóa user thành công !",
-      status: "success",
-    });
+      res.status(201).json({
+        message: "Xóa user thành công !",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
   } catch (error) {
     return next(appError(error.message, 500));
   }
@@ -220,42 +243,46 @@ const deleteUserCtrl = async (req, res, next) => {
 
 const updateShippingAddressCtrl = async (req, res, next) => {
   try {
-    const {
-      firstName,
-      lastName,
-      address,
-      city,
-      postalCode,
-      province,
-      phone,
-      country,
-    } = req.body;
+    if (req.session.authorized) {
+      const {
+        firstName,
+        lastName,
+        address,
+        city,
+        postalCode,
+        province,
+        phone,
+        country,
+      } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      req.userAuth,
-      {
-        shippingAddress: {
-          firstName,
-          lastName,
-          address,
-          city,
-          postalCode,
-          province,
-          phone,
-          country,
+      const user = await User.findByIdAndUpdate(
+        req.userAuth,
+        {
+          shippingAddress: {
+            firstName,
+            lastName,
+            address,
+            city,
+            postalCode,
+            province,
+            phone,
+            country,
+          },
+          hasShippingAddress: true,
         },
-        hasShippingAddress: true,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    res.status(201).json({
-      user,
-      message: "Cập nhật địa chỉ nhận hàng thành công !",
-      status: "success",
-    });
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.status(201).json({
+        user,
+        message: "Cập nhật địa chỉ nhận hàng thành công !",
+        status: "success",
+      });
+    } else {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
   } catch (error) {
     return next(appError(error.message, 500));
   }
@@ -268,6 +295,9 @@ const updateShippingAddressCtrl = async (req, res, next) => {
 //upload Photo
 const uploadPhotoProfileCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     //find the user to be update
     const user = await User.findById(req.userAuth);
     // check if user is found
@@ -307,6 +337,10 @@ const uploadPhotoProfileCtrl = async (req, res, next) => {
 const updatePasswordUserCtrl = async (req, res, next) => {
   const { password, retypePassword } = req.body;
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
+
     // check if user is updating the password
     if (password && retypePassword && password === retypePassword) {
       const salt = await bcrypt.genSalt(10);
@@ -343,6 +377,9 @@ const updatePasswordUserCtrl = async (req, res, next) => {
 const resetPasswordUserCtrl = async (req, res, next) => {
   const { email, password, retypePassword } = req.body;
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     if (email && password && retypePassword) {
       if (password !== retypePassword) {
         return next(
@@ -380,6 +417,9 @@ const reqResetPasswordCtrl = async (req, res, next) => {
   console.log(email);
   // check email in DB
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const user = await User.findOne({ email });
     if (!user) {
       return next(appError("Email không tồn tại, vui lòng kiểm tra lại", 403));
@@ -404,6 +444,9 @@ const reqResetPasswordCtrl = async (req, res, next) => {
 // Admin block user
 const blockUserCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
       return next(appError("User không tồn tại", 403));
@@ -434,6 +477,9 @@ const blockUserCtrl = async (req, res, next) => {
 // Admin unblock user
 const unblockUserCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const userFound = await User.findById(req.params.id);
     if (!userFound) {
       return next(appError("User không tồn tại", 403));
@@ -462,6 +508,9 @@ const unblockUserCtrl = async (req, res, next) => {
 // Admin Dashboard
 const adminDashboardCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
   } catch (error) {
     return next(appError(error.message, 500));
   }

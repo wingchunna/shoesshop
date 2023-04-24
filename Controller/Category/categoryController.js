@@ -7,7 +7,9 @@ const { appError, notFound } = require("../../Middlewares/appError");
 
 const addCategoryCtrl = async (req, res, next) => {
   //check Category exits
-  try {
+  try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name, user, product } = req.body;
     if (name) {
       const categoryFound = await Category.findOne({ name });
@@ -43,7 +45,9 @@ const addCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getAllCategoryCtrl = async (req, res, next) => {
-  try {
+  try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const categories = await Category.find();
     if (!categories) {
       return next(appError("Không tìm thấy danh sách danh mục", 403));
@@ -63,7 +67,9 @@ const getAllCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const getCategoryByIdCtrl = async (req, res, next) => {
-  try {
+  try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const category = await Category.findById(req.params.id);
     if (!category) {
       next(appError("Không tìm thấy danh mục !", 403));
@@ -83,7 +89,9 @@ const getCategoryByIdCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const updateCategoryCtrl = async (req, res, next) => {
-  try {
+  try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name } = req.body;
     if (!req.file) {
       return next(appError("Bạn cần upload hình ảnh !", 403));
@@ -113,7 +121,9 @@ const updateCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 const deleteCategoryCtrl = async (req, res, next) => {
-  try {
+  try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const category = await Category.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa danh mục sản phẩm thành công !",
@@ -129,7 +139,9 @@ const deleteCategoryCtrl = async (req, res, next) => {
 //@access Private/Admin
 
 // const uploadPhotoCategoryCtrl = async (req, res, next) => {
-//   try {
+//   try { if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
 //     const category = await Category.findById(req.params.id);
 //     // check if product is found
 //     if (!category) {

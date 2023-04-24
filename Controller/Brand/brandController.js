@@ -8,6 +8,9 @@ const { appError, notFound } = require("../../Middlewares/appError");
 const addBrandCtrl = async (req, res, next) => {
   //check Brand exits
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name, user, product, image } = req.body;
     if (name) {
       const brandFound = await Brand.findOne({ name });
@@ -45,6 +48,9 @@ const addBrandCtrl = async (req, res, next) => {
 
 const getAllBrandCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const brands = await Brand.find();
     if (!brands) {
       return next(appError("Không tìm thấy danh sách nhãn hàng", 403));
@@ -66,6 +72,9 @@ const getAllBrandCtrl = async (req, res, next) => {
 
 const getBrandByIdCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const brand = await Brand.findById(req.params.id);
     if (!brand) {
       next(appError("Không tìm thấy nhãn hàng !", 403));
@@ -86,6 +95,9 @@ const getBrandByIdCtrl = async (req, res, next) => {
 
 const updateBrandCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const { name } = req.body;
     if (!req.file) {
       return next(appError("Bạn cần upload hình ảnh", 403));
@@ -117,6 +129,9 @@ const updateBrandCtrl = async (req, res, next) => {
 
 const deleteBrandCtrl = async (req, res, next) => {
   try {
+    if (!req.session.authorized) {
+      return next(appError("Bạn cần đăng nhập", 403));
+    }
     const brand = await Brand.findByIdAndDelete(req.params.id);
     res.status(201).json({
       message: "Xóa nhãn hàng thành công !",

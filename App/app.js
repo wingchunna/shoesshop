@@ -2,8 +2,7 @@ const express = require("express");
 const { appError, notFound } = require("../Middlewares/appError");
 const app = express();
 
-const session = require("cookie-session");
-const cookieParser = require("cookie-parser");
+const session = require("express-session");
 
 require("dotenv").config();
 require("../Config/dbConnect");
@@ -21,14 +20,22 @@ app.set("trust proxy", 1);
 // config session
 app.use(
   session({
+    name: "cookye",
     secret: process.env.SESSION_SECRET_KEY,
+    cookie: {
+      sameSite :"strict",
+      secure: false,
+      saveUninitialized: true,
+      maxAge : 60000
+    }
     resave: false,
     // store: new RedisStore(),
-    saveUninitialized: true,
-    cookie: { secure: true, maxAge: 60000 },
   })
 );
-
+app.use(function (req, res, next) {
+  req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
+  next();
+});
 //Routes
 //User Routes
 
