@@ -47,7 +47,7 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 //Routes
 //User Routes
