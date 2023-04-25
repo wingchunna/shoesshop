@@ -12,6 +12,7 @@ const mailer = require("../../Utils/mailer");
 const userRegisterCtrl = async (req, res, next) => {
   //check user exits
   const { email, fullname, password } = req.body;
+
   if (email && fullname && password) {
     const userExits = await User.findOne({ email });
     if (userExits) {

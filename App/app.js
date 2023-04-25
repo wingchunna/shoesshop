@@ -16,7 +16,7 @@ const reviewRoutes = require("../Routes/reviews/reviewRoute");
 const orderRoutes = require("../Routes/orders/orderRoute");
 const couponRoutes = require("../Routes/coupons/couponRoute");
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("trust proxy", 1);
 // config session
