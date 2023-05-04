@@ -20,8 +20,11 @@ const addCouponCtrl = async (req, res, next) => {
       if (isNaN(discount)) {
         return next(appError("Discount phải là số", 403));
       }
-      const currentDate = getDateNow();
-
+      const currentDate = moment(getDateNow(), "DD/MM/YYYY");
+      startDate = moment(startDate, "DD/MM/YYYY");
+      endDate = moment(endDate, "DD/MM/YYYY");
+      console.log(currentDate);
+      console.log(startDate);
       if (startDate < currentDate) {
         return next(
           appError("Bạn phải nhập thời gian bắt đầu muộn hơn hiện tại", 403)

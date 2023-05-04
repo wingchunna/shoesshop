@@ -28,7 +28,7 @@ app.use(
       sameSite: "strict",
       secure: false,
       saveUninitialized: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7 * 4 * 6,
+      maxAge: 1000 * 60 * 60 * 24,
       resave: false,
     },
 
@@ -36,7 +36,7 @@ app.use(
   })
 );
 app.use(function (req, res, next) {
-  req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
+  // req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
   // Website you wish to allow to connect
   res.setHeader("Access-Control-Allow-Origin", "*");
 

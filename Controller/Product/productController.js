@@ -44,6 +44,7 @@ const addProductCtrl = async (req, res, next) => {
       const categoryFound = await Category.findOne({
         name: category,
       });
+      console.log(categoryFound);
       if (!categoryFound) {
         return next(appError("Không tìm thấy danh mục sản phẩm", 403));
       }
