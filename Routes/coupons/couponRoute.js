@@ -5,6 +5,7 @@ const {
   getCouponByIdCtrl,
   updateCouponCtrl,
   deleteCouponCtrl,
+  getCouponByNameCtrl,
 } = require("../../Controller/Coupon/couponController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -18,6 +19,9 @@ couponRoutes.get("/", getAllCouponCtrl);
 
 //GET/Coupons/:id
 couponRoutes.get("/:id", getCouponByIdCtrl);
+
+//GET/Coupons/name
+couponRoutes.get("/getcoupon/:code", getCouponByNameCtrl);
 
 //DELETE/Coupons/
 couponRoutes.delete("/:id", isLogin, isAdmin, deleteCouponCtrl);

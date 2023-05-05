@@ -143,6 +143,30 @@ const getCouponByIdCtrl = async (req, res, next) => {
   }
 };
 
+//@desc Get Coupon By Name
+//@route GET /api/v1/Coupons/?name
+//@access Private/Admin
+
+const getCouponByNameCtrl = async (req, res, next) => {
+  try {
+    const coupon = await Coupon.findOne({ code: req.params.code });
+    if (!coupon) {
+      res.status(403).json({
+        coupon,
+        status: "failed",
+        message: "Mã giảm giá không hợp lệ !",
+      });
+    }
+    res.status(201).json({
+      coupon,
+      status: "success",
+      message: "Tìm kiếm Coupon thành công !",
+    });
+  } catch (error) {
+    next(appError(error.message, 500));
+  }
+};
+
 //@desc Update Coupon
 //@route PUT /api/v1/Coupons/:id
 //@access Private/Admin
@@ -232,4 +256,5 @@ module.exports = {
   getCouponByIdCtrl,
   updateCouponCtrl,
   deleteCouponCtrl,
+  getCouponByNameCtrl,
 };
