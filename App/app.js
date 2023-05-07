@@ -84,4 +84,9 @@ app.get("/favicon.ico", (req, res) => {
 app.use(notFound);
 //error middlewares
 
+// 👇️ handle uncaught exceptions
+process.on("uncaughtException", function (err) {
+  console.log(err);
+});
+
 module.exports = app;

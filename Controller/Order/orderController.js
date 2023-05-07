@@ -98,30 +98,31 @@ const addOrderCtrl = async (req, res, next) => {
       // dùng để xác thực và tìm kiếm mã đơn hàng
       myOrderId: order?._id,
     };
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false, // (NOTE: this will disable client verification)
-      cert: fs.readFileSync("./cert.pem"),
-      key: fs.readFileSync("./key.pem"),
-    });
+    // const httpsAgent = new https.Agent({
+    //   rejectUnauthorized: false, // (NOTE: this will disable client verification)
+    //   cert: fs.readFileSync("./cert.pem"),
+    //   key: fs.readFileSync("./key.pem"),
+    // });
     // gửi tham số đến hàm create Payment để nhận về UrL điền thẻ ngân hàng của Vnpay
     axios({
       method: "post",
       url: createPaymentUrl,
-      httpsAgent,
+
       data: data,
       headers: {
-        Authorization: `Bearer ${userToken}`,
-        "Content-Type": "application/json",
+        "Content-type": "application/json",
+        Authorization: `Bearer ` + userToken,
       },
     })
       .then(function (response) {
         // console.log(response.data.vnpUrl);
+        console.log(response.data);
         res.status(201).json({
           url: response.data.vnpUrl,
         });
       })
       .catch(function (error) {
-        console.log(error);
+        console.log(error.message);
       });
 
     // payment webhook
@@ -233,7 +234,7 @@ const deleteOrderCtrl = async (req, res, next) => {
 //@access Private/Admin
 const createPaymentUrlCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
+    if (!req.headers.authorization) {
       return next(appError("Bạn cần đăng nhập", 401));
     }
     let myOrderId = req.body.myOrderId;
@@ -296,6 +297,7 @@ const createPaymentUrlCtrl = async (req, res, next) => {
         runValidators: true,
       }
     );
+    // console.log(order);
     await order.save();
 
     // gửi thông báo

@@ -78,6 +78,7 @@ const userLoginCtrl = async (req, res, next) => {
       const userToken = generateToken(userFound?._id);
       req.session.user = userToken;
       req.session.authorized = true;
+
       res.status(201).json({
         user: userFound,
         token: userToken,
