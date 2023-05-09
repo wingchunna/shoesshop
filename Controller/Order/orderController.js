@@ -12,7 +12,7 @@ const dateFormat = require("date-format");
 const https = require("https");
 const fs = require("fs");
 const getTokenFromHeader = require("../../Utils/getTokenFromHeader");
-
+// const socket = require("../../server");
 require("dotenv").config();
 
 //@desc Register Order
@@ -21,26 +21,12 @@ require("dotenv").config();
 
 const addOrderCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
+    if (!req.headers.authorization) {
       return next(appError("Bạn cần đăng nhập", 401));
     }
     //check payload
     const { orderItems, shippingAddress, totalPrice } = req.body;
     const { coupon } = req?.query;
-
-    // kiểm tra coupon
-    const couponFound = await Coupon.findOne({
-      code: coupon?.toUpperCase(),
-    });
-    if (couponFound?.isExpired) {
-      return next(appError("Coupon đã hết hạn sử dụng", 403));
-    }
-    if (!couponFound) {
-      return next(appError("Coupon không tồn tại", 403));
-    }
-
-    // get discount
-    const discount = couponFound?.discount / 100;
 
     const userToken = getTokenFromHeader(req);
     //find user
@@ -60,13 +46,43 @@ const addOrderCtrl = async (req, res, next) => {
     if (!user?.hasShippingAddress) {
       return next(appError("Bạn chưa có địa chỉ nhận hàng", 403));
     }
-    //place/create order
-    const order = await Order.create({
-      user: user?._id,
-      orderItems,
-      shippingAddress,
-      totalPrice: couponFound ? totalPrice - totalPrice * discount : totalPrice,
-    });
+    let order = null;
+    let couponFound = null;
+    let discount = null;
+    if (coupon != "") {
+      // kiểm tra coupon
+      couponFound = await Coupon.findOne({
+        code: coupon?.toUpperCase(),
+      });
+      if (couponFound?.isExpired) {
+        return next(appError("Coupon đã hết hạn sử dụng", 403));
+      }
+      if (!couponFound) {
+        return next(appError("Coupon không tồn tại", 403));
+      }
+
+      // get discount
+      discount = couponFound?.discount / 100;
+
+      //place/create order
+      order = await Order.create({
+        user: user?._id,
+        orderItems,
+        shippingAddress,
+        totalPrice: couponFound
+          ? totalPrice - totalPrice * discount
+          : totalPrice,
+      });
+    } else {
+      //place/create order
+      order = await Order.create({
+        user: user?._id,
+        orderItems,
+        shippingAddress,
+        totalPrice: totalPrice,
+      });
+    }
+    console.log(orderItems);
 
     // push order into user
     user?.orders.push(order?._id);
@@ -171,6 +187,30 @@ const getOrderByIdCtrl = async (req, res, next) => {
     }
     res.status(201).json({
       order,
+      status: "success",
+      message: "Tìm kiếm đơn hàng thành công !",
+    });
+  } catch (error) {
+    next(appError("Không tìm thấy đơn hàng !", 500));
+  }
+};
+
+//@desc Get Order By Id
+//@route GET /api/v1/Orders/:id
+//@access Private/Admin
+
+const getOrderByUserCtrl = async (req, res, next) => {
+  try {
+    if (!req.headers.authorization) {
+      return next(appError("Bạn cần đăng nhập", 401));
+    }
+    console.log(req.userAuth);
+    const orders = await Order.find({ user: req.userAuth });
+    if (!orders) {
+      next(appError("Không tìm thấy đơn hàng !", 403));
+    }
+    res.status(201).json({
+      orders,
       status: "success",
       message: "Tìm kiếm đơn hàng thành công !",
     });
@@ -508,9 +548,6 @@ const refundCtrl = async (req, res, next) => {
 //@access Private/Admin
 const getVNPayIpnCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 401));
-    }
     let vnp_params = req.query;
     let secureHash = vnp_params["vnp_SecureHash"];
 
@@ -611,9 +648,6 @@ const getVNPayIpnCtrl = async (req, res, next) => {
 //@access Private/Admin
 const getVNPayReturnCtrl = async (req, res, next) => {
   try {
-    if (!req.session.authorized) {
-      return next(appError("Bạn cần đăng nhập", 401));
-    }
     let vnp_params = req.query;
     let secureHash = vnp_params["vnp_SecureHash"];
 
@@ -630,16 +664,24 @@ const getVNPayReturnCtrl = async (req, res, next) => {
 
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-
-      res.status(201).json({
-        status: "success",
-        code: vnp_params["vnp_ResponseCode"],
-      });
+      // socket.ioObject.emit("Server-sent-data", vnp_params["vnp_ResponseCode"]);
+      // res.status(201).json({
+      //   status: "success",
+      //   code: vnp_params["vnp_ResponseCode"],
+      // });
+      res.redirect("http://localhost:3000/order-success");
+      //Gửi mail xác nhận đặt hàng thành công
+      //server lắng nghe dữ liệu từ client
     } else {
-      res.status(201).json({
-        status: "success",
-        code: "97",
-      });
+      // socket.ioObject.emit("Server-sent-data", "97");
+      // res.status(201).json({
+      //   status: "success",
+      //   code: "97",
+      // });
+      res.redirect("http://localhost:3000/order-failed");
+      //server lắng nghe dữ liệu từ client
+
+      //sau khi lắng nghe dữ liệu, server phát lại dữ liệu này đến các client khác
     }
   } catch (error) {
     return next(appError(error.message, 500));
@@ -717,4 +759,5 @@ module.exports = {
   getVNPayIpnCtrl,
   getVNPayReturnCtrl,
   getOrderStatsCtrl,
+  getOrderByUserCtrl,
 };

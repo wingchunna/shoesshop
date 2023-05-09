@@ -11,6 +11,7 @@ const {
   getVNPayIpnCtrl,
   getVNPayReturnCtrl,
   getOrderStatsCtrl,
+  getOrderByUserCtrl,
 } = require("../../Controller/Order/orderController");
 const isLogin = require("../../Middlewares/isLogin");
 const isAdmin = require("../../Middlewares/isAdmin");
@@ -24,6 +25,8 @@ orderRoutes.get("/", getAllOrderCtrl);
 
 //GET/Orders/:id
 orderRoutes.get("/:id", getOrderByIdCtrl);
+
+orderRoutes.get("/user/:userId", isLogin, getOrderByUserCtrl);
 
 //DELETE/Orders/
 orderRoutes.delete("/:id", isLogin, deleteOrderCtrl);

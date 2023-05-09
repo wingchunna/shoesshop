@@ -11,12 +11,12 @@ const isLogin = (req, res, next) => {
     //save the user in to req obj
     req.userAuth = decodedUser.id;
     if (!decodedUser) {
-      return next(appError("Token Invalid or Expired, please Login Back !"));
+      return next(appError("Bạn cần đăng nhập để thực hiện hành động này !"));
     } else {
       next();
     }
   } else {
-    return next(appError("Token Invalid or Expired, please Login Back !"));
+    return next(appError("Bạn cần đăng nhập để thực hiện hành động này !"));
   }
 };
 
