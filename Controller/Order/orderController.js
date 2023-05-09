@@ -669,7 +669,7 @@ const getVNPayReturnCtrl = async (req, res, next) => {
       //   status: "success",
       //   code: vnp_params["vnp_ResponseCode"],
       // });
-      res.redirect("http://localhost:3000/order-success");
+      res.redirect("https://shoesshop-frontend.vercel.app/order-success");
       //Gửi mail xác nhận đặt hàng thành công
       //server lắng nghe dữ liệu từ client
     } else {
@@ -678,7 +678,7 @@ const getVNPayReturnCtrl = async (req, res, next) => {
       //   status: "success",
       //   code: "97",
       // });
-      res.redirect("http://localhost:3000/order-failed");
+      res.redirect("https://shoesshop-frontend.vercel.app/order-failed");
       //server lắng nghe dữ liệu từ client
 
       //sau khi lắng nghe dữ liệu, server phát lại dữ liệu này đến các client khác
