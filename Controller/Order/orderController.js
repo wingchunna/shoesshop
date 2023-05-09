@@ -606,7 +606,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
               //that bai
               //paymentStatus = '2'
               // Ở đây cập nhật trạng thái /giao dịch thanh toán thất bại vào CSDL của bạn
-
+              console.log("1-paid");
               res.status(201).json({
                 RspCode: "00",
                 Message: "Cập nhật đơn hàng vào CSDL thất bại",
@@ -621,6 +621,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
             });
           }
         } else {
+          console.log("unpaid");
           res.status(201).json({
             RspCode: "04",
             Message: "Số tiền không hợp lệ",
