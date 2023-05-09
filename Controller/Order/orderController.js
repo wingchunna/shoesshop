@@ -668,20 +668,20 @@ const getVNPayReturnCtrl = async (req, res, next) => {
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
       // socket.ioObject.emit("Server-sent-data", vnp_params["vnp_ResponseCode"]);
-      // res.status(201).json({
-      //   status: "success",
-      //   code: vnp_params["vnp_ResponseCode"],
-      // });
-      res.redirect("https://shoesshop-frontend.vercel.app/order-success");
+      res.status(201).json({
+        status: "success",
+        code: vnp_params["vnp_ResponseCode"],
+      });
+      // res.redirect("https://shoesshop-frontend.vercel.app/order-success");
       //Gửi mail xác nhận đặt hàng thành công
       //server lắng nghe dữ liệu từ client
     } else {
       // socket.ioObject.emit("Server-sent-data", "97");
-      // res.status(201).json({
-      //   status: "success",
-      //   code: "97",
-      // });
-      res.redirect("https://shoesshop-frontend.vercel.app/order-failed");
+      res.status(201).json({
+        status: "success",
+        code: "97",
+      });
+      // res.redirect("https://shoesshop-frontend.vercel.app/order-failed");
       //server lắng nghe dữ liệu từ client
 
       //sau khi lắng nghe dữ liệu, server phát lại dữ liệu này đến các client khác
