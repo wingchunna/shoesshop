@@ -596,6 +596,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
                   runValidators: true,
                 }
               );
+              console.log("paid");
               res.status(201).json({
                 RspCode: "00",
                 Message: "Bạn đã thanh toán thành công !",
