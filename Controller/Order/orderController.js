@@ -82,7 +82,6 @@ const addOrderCtrl = async (req, res, next) => {
         totalPrice: totalPrice,
       });
     }
-    console.log(orderItems);
 
     // push order into user
     user?.orders.push(order?._id);
@@ -132,7 +131,7 @@ const addOrderCtrl = async (req, res, next) => {
     })
       .then(function (response) {
         // console.log(response.data.vnpUrl);
-        console.log(response.data);
+
         res.status(201).json({
           url: response.data.vnpUrl,
         });
@@ -204,7 +203,7 @@ const getOrderByUserCtrl = async (req, res, next) => {
     if (!req.headers.authorization) {
       return next(appError("Bạn cần đăng nhập", 401));
     }
-    console.log(req.userAuth);
+
     const orders = await Order.find({ user: req.userAuth });
     if (!orders) {
       next(appError("Không tìm thấy đơn hàng !", 403));
@@ -570,7 +569,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
 
     let checkOrderId = true; // Mã đơn hàng "giá trị của vnp_TxnRef" VNPAY phản hồi tồn tại trong CSDL của bạn
     let checkAmount = true;
-
+    console.log("IPN");
     // Kiểm tra số tiền "giá trị của vnp_Amout/100" trùng khớp với số tiền của đơn hàng trong CSDL của bạn
     if (secureHash === signed) {
       //kiểm tra checksum
@@ -629,6 +628,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
           });
         }
       } else {
+        console.log("không thấy đơn hàng");
         res.status(201).json({
           RspCode: "01",
           Message: "Không tìm thấy đơn hàng",
@@ -636,6 +636,7 @@ const getVNPayIpnCtrl = async (req, res, next) => {
         });
       }
     } else {
+      console.log("mã lỗi 97");
       res
         .status(201)
         .json({ RspCode: "97", Message: "Mã xác thực lỗi", status: "success" });
